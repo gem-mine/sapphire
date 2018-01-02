@@ -1,0 +1,17 @@
+{
+  "parser": "babel-eslint",
+  "extends": "airbnb/base",
+  "env": {
+    "mocha": true
+  },
+  "rules": {
+    "no-param-reassign": 0,
+    "comma-dangle": [
+      "error",
+      {
+        "objects": "ignore"
+      }
+    ],
+    "arrow-parens": ["error", "as-needed"]
+  }
+}

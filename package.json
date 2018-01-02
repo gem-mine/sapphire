@@ -1,0 +1,24 @@
+{
+  "name": "gem-mine",
+  "version": "0.1.0",
+  "description": "a fantastic react boilerplate ",
+  "keywords": ["react", "redux", "boilerplate", "fish", "ant design", "IE8", "mirror", "model", "mobile"],
+  "author": {
+    "email": "caolvchong@gmail.com",
+    "name": "洪军钊"
+  },
+  "main": "scripts/index.js",
+  "bin": { "gem-mine": "scripts/index.js" },
+  "scripts": {},
+  "dependencies": {
+    "chalk": "^2.3.0",
+    "commander": "^2.11.0",
+    "figlet": "^1.2.0",
+    "fs-extra": "^5.0.0",
+    "inquirer": "^4.0.0",
+    "mkdirp": "^0.5.1",
+    "request": "^2.83.0",
+    "validate-npm-package-name": "^3.0.0"
+  },
+  "devDependencies": {}
+}
