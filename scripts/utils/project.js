@@ -12,6 +12,7 @@ const exec = helper.exec;
 function create(root, projectName, params) {
   checkProjectName(root, projectName, params);
   cloneFromGit(root, projectName, params);
+  installClassic(root, projectName, params);
   installDeps(root, projectName, params);
   updatePackageJson(root, projectName, params);
   saveInfo(root, projectName, params);
@@ -84,6 +85,31 @@ function cloneFromGit(root, projectName, params, isUpdate) {
   fs.removeSync(shadowPath);
 }
 
+function installClassic(root, projectName, params) {
+  let ui = params.ui;
+
+  if (ui) {
+    if (ui === constant.FISH || ui === constant.ANTD) {
+      if (ui.indexOf(constant.SDP_PREFIX) === 0) {
+        ui = ui.replace(constant.SDP_PREFIX, '');
+      }
+      const branch = ui;
+      const shadowPath = fs.mkdtempSync(path.join(os.tmpdir(), 'classic-'));
+      if (fs.existsSync(shadowPath)) {
+        fs.removeSync(shadowPath);
+      }
+      exec(`git clone ${constant.CLASSIC_REPO} ${shadowPath} --depth=1 --no-single-branch`);
+
+      exec(`git checkout ${branch}`, { cwd: shadowPath, silent: true });
+
+      fs.removeSync(path.join(shadowPath, '.git'));
+      fs.removeSync(path.join(shadowPath, '.gitignore'));
+      fs.copySync(shadowPath, root);
+      fs.removeSync(shadowPath);
+    }
+  }
+}
+
 function gitInit(root, projectName, params) {
   if (!fs.existsSync(path.join(root, '.git'))) {
     exec(`git init`, { cwd: root, silent: true });
@@ -112,7 +138,7 @@ function installDeps(root, projectName, params) {
 
   const ui = params.ui;
   if (ui) {
-    if (ui.indexOf('@sdp.nd') === 0) {
+    if (ui.indexOf(constant.SDP_PREFIX) === 0) {
       exec(`npm i ${ui} --save --registry=http://registry.npm.sdp.nd --loglevel=error`, { cwd: root });
     } else {
       exec(`npm i ${ui} --save --loglevel=error`, { cwd: root });
@@ -160,7 +186,7 @@ function printSuccess(root, projectName, params, isUpdate) {
   );
   console.log('\n');
   console.log(chalk.cyan(constant.SAYINGS[Math.floor(Math.random() * constant.SAYINGS.length)]));
-  console.log(chalk.magenta(`愿你可以找到属于你内心的平静、自由、快乐还有梦想 ── ${constant.EMAIL}\n`));
+  console.log(chalk.magenta(`${constant.WISH}\n`));
   const ui = params.ui;
   let uiDoc = '';
   if (ui) {

@@ -12,7 +12,7 @@ function run() {
         value: constant.FISH_MOBILE
       },
       {
-        name: 'ant design mobile（仅供实验使用）',
+        name: 'ant design mobile（仅供学习使用）',
         value: constant.ANTD_MOBILE
       },
       {

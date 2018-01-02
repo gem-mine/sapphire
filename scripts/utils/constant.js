@@ -25,13 +25,18 @@ exports.UI_DOC = {
   [FISH_MOBILE]: FISH_MOBILE_DOC
 };
 
-// const REPO = 'https://github.com/caolvchong/gem-mine-template.git';
-const REPO = '~/nd/my-pure/gem-mine-template';
+const REPO = 'https://github.com/gem-mine/gem-mine-template.git';
+// const REPO = '~/nd/my-pure/gem-mine-template';
 exports.REPO = REPO;
+
+const CLASSIC_REPO = 'https://github.com/gem-mine/classic.git';
+// const CLASSIC_REPO = '~/nd/my-pure/classic';
+exports.CLASSIC_REPO = CLASSIC_REPO;
 
 exports.MOBILE = 'mobile';
 exports.PC = 'pc';
-exports.EMAIL = 'caolvchong@gmail.com';
+const EMAIL = 'caolvchong@gmail.com';
+exports.EMAIL = EMAIL;
 
 exports.SAYINGS = [
   '软件在能够复用前必须先能用 ── Ralph Johnson',
@@ -43,3 +48,5 @@ exports.SAYINGS = [
   '当你试图解决一个你不理解的问题时，复杂化就产成了 ── Andy Boothe',
   '九个人不能让一个孩子在一个月内出生 ── Fred Brooks'
 ];
+
+exports.WISH = `愿你可以找到属于你内心的平静、自由、快乐还有梦想 ── ${EMAIL}`;

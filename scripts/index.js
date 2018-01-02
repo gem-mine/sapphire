@@ -102,9 +102,9 @@ function run(root, projectName, _cache) {
           return utils.step.pc.ui(data.ie8).then(function(data) {
             if (data.ui) {
               _cache.ui = data.ui;
-              // return utils.step.pc.classic().then(function(data) {
-              //   _cache.classic = data.classic;
-              // });
+              return utils.step.pc.classic().then(function(data) {
+                _cache.classic = data.classic;
+              });
             }
           });
         });

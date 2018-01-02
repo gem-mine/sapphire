@@ -12,7 +12,7 @@ function run(ie8) {
   ];
   if (!ie8) {
     choices.push({
-      name: 'ant design（仅供实验使用）',
+      name: 'ant design（仅供学习使用）',
       value: ANTD
     });
   }
