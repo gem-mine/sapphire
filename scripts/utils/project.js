@@ -93,7 +93,7 @@ function installClassic(root, projectName, params) {
       if (ui.indexOf(constant.SDP_PREFIX) === 0) {
         ui = ui.replace(constant.SDP_PREFIX, '');
       }
-      const branch = ui;
+      const branch = `${ui}-admin`;
       const shadowPath = fs.mkdtempSync(path.join(os.tmpdir(), 'classic-'));
       if (fs.existsSync(shadowPath)) {
         fs.removeSync(shadowPath);
