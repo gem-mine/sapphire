@@ -110,8 +110,29 @@ function installClassic(root, projectName, params) {
   }
 }
 
+function isGitRepo(root) {
+  let flag = 20;
+  let p = root;
+  let s;
+  let existGit = false;
+  while (flag > 0) {
+    existGit = fs.existsSync(path.join(p, '.git'));
+    if (existGit) {
+      existGit = true;
+      break;
+    }
+    s = path.dirname(p);
+    if (s === p) {
+      break;
+    }
+    p = s;
+    flag -= 1;
+  }
+  return existGit;
+}
+
 function gitInit(root, projectName, params) {
-  if (!fs.existsSync(path.join(root, '.git'))) {
+  if (!isGitRepo(root)) {
     exec(`git init`, { cwd: root, silent: true });
     exec(`git add .`, { cwd: root, silent: true });
     const msg = 'init by gem-mine 👻';
