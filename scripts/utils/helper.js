@@ -9,7 +9,7 @@ function exec(cmd, ext) {
       .trim();
   } else {
     if (ext && ext.silent) {
-      const params = Object.assign({ stdio: [0, 0, process.stderr] }, ext);
+      const params = Object.assign({}, ext);
       execSync(cmd, params);
     } else {
       const params = Object.assign({ stdio: [process.stdin, process.stdout, process.stderr] }, ext);
