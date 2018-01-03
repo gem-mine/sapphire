@@ -107,8 +107,8 @@ function installClassic(root, projectName, params) {
       fs.removeSync(path.join(shadowPath, '.gitignore'))
       fs.removeSync(path.join(shadowPath, '.eslintignore'))
       fs.removeSync(path.join(shadowPath, '.eslintrc'))
-      fs.removeSync(path.join(shadowPath, '.package-lock.json'))
-      fs.removeSync(path.join(shadowPath, '.package.json'))
+      fs.removeSync(path.join(shadowPath, 'package-lock.json'))
+      fs.removeSync(path.join(shadowPath, 'package.json'))
       fs.copySync(shadowPath, root)
       fs.removeSync(shadowPath)
     }
@@ -253,7 +253,6 @@ function saveInfo(root, projectName, params) {
   if (params.classic) {
     info.classic = params.classic
   }
-  console.log(params)
   fs.writeFileSync(infoPath, JSON.stringify(info, null, 2))
 }
 

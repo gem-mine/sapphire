@@ -1,18 +1,8 @@
 {
   "name": "gem-mine",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "a fantastic react boilerplate ",
-  "keywords": [
-    "react",
-    "redux",
-    "boilerplate",
-    "fish",
-    "ant design",
-    "IE8",
-    "mirror",
-    "model",
-    "mobile"
-  ],
+  "keywords": ["react", "redux", "boilerplate", "fish", "ant design", "IE8", "mirror", "model", "mobile"],
   "author": {
     "email": "caolvchong@gmail.com",
     "name": "洪军钊"
