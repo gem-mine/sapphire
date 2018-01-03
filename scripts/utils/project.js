@@ -87,8 +87,9 @@ function cloneFromGit(root, projectName, params, isUpdate) {
 
 function installClassic(root, projectName, params) {
   let ui = params.ui;
+  let classic = params.classic;
 
-  if (ui) {
+  if (classic) {
     if (ui === constant.FISH || ui === constant.ANTD) {
       if (ui.indexOf(constant.SDP_PREFIX) === 0) {
         ui = ui.replace(constant.SDP_PREFIX, '');
@@ -245,6 +246,10 @@ function saveInfo(root, projectName, params) {
   if (params.ui) {
     info.ui = params.ui;
   }
+  if (params.classic) {
+    info.classic = params.classic;
+  }
+  console.log(params);
   fs.writeFileSync(infoPath, JSON.stringify(info, null, 2));
 }
 
