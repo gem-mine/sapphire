@@ -1,5 +1,5 @@
-const inquirer = require('inquirer');
-const constant = require('../../constant');
+const inquirer = require('inquirer')
+const constant = require('../../constant')
 
 function run() {
   return inquirer.prompt({
@@ -20,7 +20,7 @@ function run() {
         value: ''
       }
     ]
-  });
+  })
 }
 
-module.exports = run;
+module.exports = run

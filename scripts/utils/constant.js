@@ -1,42 +1,42 @@
-const SDP_PREFIX = '@sdp.nd/';
-exports.SDP_PREFIX = SDP_PREFIX;
+const SDP_PREFIX = '@sdp.nd/'
+exports.SDP_PREFIX = SDP_PREFIX
 
-const FISH = SDP_PREFIX + 'fish';
-const ANTD = 'antd';
-const ANTD_MOBILE = 'antd-mobile';
-const FISH_MOBILE = SDP_PREFIX + 'fish-mobile';
+const FISH = SDP_PREFIX + 'fish'
+const ANTD = 'antd'
+const ANTD_MOBILE = 'antd-mobile'
+const FISH_MOBILE = SDP_PREFIX + 'fish-mobile'
 
-exports.FISH = FISH;
-exports.ANTD = ANTD;
-exports.ANTD_MOBILE = ANTD_MOBILE;
-exports.FISH_MOBILE = FISH_MOBILE;
+exports.FISH = FISH
+exports.ANTD = ANTD
+exports.ANTD_MOBILE = ANTD_MOBILE
+exports.FISH_MOBILE = FISH_MOBILE
 
-const FISH_DOC = 'http://fish-docs.sdp.101.com';
-const ANTD_DOC = 'https://ant.design';
-const ANTD_MOBILE_DOC = 'https://mobile.ant.design';
-const FISH_MOBILE_DOC = '';
+const FISH_DOC = 'http://fish-docs.sdp.101.com'
+const ANTD_DOC = 'https://ant.design'
+const ANTD_MOBILE_DOC = 'https://mobile.ant.design'
+const FISH_MOBILE_DOC = ''
 
-exports.GEM_MINE_DOC = 'http://gem-mine.club';
+exports.GEM_MINE_DOC = 'http://gem-mine.club'
 
 exports.UI_DOC = {
   [FISH]: FISH_DOC,
   [ANTD]: ANTD_DOC,
   [ANTD_MOBILE]: ANTD_MOBILE_DOC,
   [FISH_MOBILE]: FISH_MOBILE_DOC
-};
+}
 
-const REPO = 'https://github.com/gem-mine/gem-mine-template.git';
+const REPO = 'https://github.com/gem-mine/gem-mine-template.git'
 // const REPO = '~/nd/my-pure/gem-mine-template';
-exports.REPO = REPO;
+exports.REPO = REPO
 
-const CLASSIC_REPO = 'https://github.com/gem-mine/classic.git';
+const CLASSIC_REPO = 'https://github.com/gem-mine/classic.git'
 // const CLASSIC_REPO = '~/nd/my-pure/classic';
-exports.CLASSIC_REPO = CLASSIC_REPO;
+exports.CLASSIC_REPO = CLASSIC_REPO
 
-exports.MOBILE = 'mobile';
-exports.PC = 'pc';
-const EMAIL = 'caolvchong@gmail.com';
-exports.EMAIL = EMAIL;
+exports.MOBILE = 'mobile'
+exports.PC = 'pc'
+const EMAIL = 'caolvchong@gmail.com'
+exports.EMAIL = EMAIL
 
 exports.SAYINGS = [
   '软件在能够复用前必须先能用 ── Ralph Johnson',
@@ -47,6 +47,6 @@ exports.SAYINGS = [
   '软件开发往往是这样：最开始的90%代码占用了开始的90%的开发时间；剩下10%代码同样需要90%的开发时间 ── Tom Cargill',
   '当你试图解决一个你不理解的问题时，复杂化就产成了 ── Andy Boothe',
   '九个人不能让一个孩子在一个月内出生 ── Fred Brooks'
-];
+]
 
-exports.WISH = `愿你可以找到属于你内心的平静、自由、快乐还有梦想 ── ${EMAIL}`;
+exports.WISH = `愿你可以找到属于你内心的平静、自由、快乐还有梦想 ── ${EMAIL}`

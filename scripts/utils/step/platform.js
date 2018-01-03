@@ -1,4 +1,4 @@
-const inquirer = require('inquirer');
+const inquirer = require('inquirer')
 
 function run() {
   return inquirer.prompt({
@@ -15,7 +15,7 @@ function run() {
         value: 'mobile'
       }
     ]
-  });
+  })
 }
 
-module.exports = run;
+module.exports = run
