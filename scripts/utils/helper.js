@@ -17,18 +17,4 @@ function exec(cmd, ext) {
   }
 }
 
-function getLocalIP() {
-  const iptable = {}
-  const ifaces = os.networkInterfaces()
-  for (const dev in ifaces) {
-    ifaces[dev].forEach(function (details, alias) {
-      if (details.family === 'IPv4') {
-        iptable[dev + (alias ? ':' + alias : '')] = details.address
-      }
-    })
-  }
-  return iptable
-}
-
 exports.exec = exec
-exports.getLocalIP = getLocalIP

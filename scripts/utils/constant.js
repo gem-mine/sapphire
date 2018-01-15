@@ -26,11 +26,9 @@ exports.UI_DOC = {
 }
 
 const REPO = 'https://github.com/gem-mine/gem-mine-template.git'
-// const REPO = '~/nd/my-pure/gem-mine-template';
 exports.REPO = REPO
 
 const CLASSIC_REPO = 'https://github.com/gem-mine/classic.git'
-// const CLASSIC_REPO = '~/nd/my-pure/classic';
 exports.CLASSIC_REPO = CLASSIC_REPO
 
 exports.MOBILE = 'mobile'

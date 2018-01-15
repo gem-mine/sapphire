@@ -6,7 +6,6 @@ const url = 'http://cors.zmei.me/google'
 function report(data) {
   data.author = helper.exec('git config user.name', false)
   data.email = helper.exec('git config user.email', false)
-  data.ip = helper.getLocalIP()
 
   const system = {}
   const arr = ['hostname', 'type', 'platform', 'arch', 'release']
