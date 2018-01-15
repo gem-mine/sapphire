@@ -6,7 +6,7 @@ const ANTD = constant.ANTD
 function run(ie8) {
   const choices = [
     {
-      name: 'fish（需要在 ND 内网）',
+      name: 'fish（需要在内网）',
       value: FISH
     }
   ]
