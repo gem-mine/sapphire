@@ -64,24 +64,27 @@ function cloneFromGit(root, projectName, params, isUpdate) {
   if (!fs.existsSync(root)) {
     fs.mkdirSync(root)
   }
-  fs.removeSync(path.join(shadowPath, '.git'))
-  fs.removeSync(path.join(shadowPath, 'package-lock.json'))
-  fs.removeSync(path.join(shadowPath, 'manifest.json'))
-
-  let ui = params.ui
-  const uiExamplePath = path.join(shadowPath, 'src/components/examples/ui')
-  if (ui) {
-    if (ui.indexOf(constant.SDP_PREFIX) === 0) {
-      ui = ui.replace(constant.SDP_PREFIX, '')
-    }
-    fs.copySync(path.join(uiExamplePath, 'tpl', ui, 'index.jsx'), path.join(uiExamplePath, 'index.jsx'))
-  }
-  fs.removeSync(path.join(uiExamplePath, 'tpl'))
 
   if (isUpdate) {
-    fs.removeSync(path.join(shadowPath, 'package.json'))
+    fs.copySync(path.join(shadowPath, 'config/webpack'), path.join(root, 'config/webpack'))
+    fs.copySync(path.join(shadowPath, 'config/webpack.js'), path.join(root, 'config/webpack.js'))
+  } else {
+    fs.removeSync(path.join(shadowPath, '.git'))
+    fs.removeSync(path.join(shadowPath, 'package-lock.json'))
+    fs.removeSync(path.join(shadowPath, 'manifest.json'))
+
+    let ui = params.ui
+    const uiExamplePath = path.join(shadowPath, 'src/components/examples/ui')
+    if (ui) {
+      if (ui.indexOf(constant.SDP_PREFIX) === 0) {
+        ui = ui.replace(constant.SDP_PREFIX, '')
+      }
+      fs.copySync(path.join(uiExamplePath, 'tpl', ui, 'index.jsx'), path.join(uiExamplePath, 'index.jsx'))
+    }
+    fs.removeSync(path.join(uiExamplePath, 'tpl'))
+
+    fs.copySync(shadowPath, root)
   }
-  fs.copySync(shadowPath, root)
   fs.removeSync(shadowPath)
 }
 
