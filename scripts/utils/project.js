@@ -14,7 +14,7 @@ function create(root, projectName, params) {
   cloneFromGit(root, projectName, params)
   installClassic(root, projectName, params)
   installDeps(root, projectName, params)
-  updatePackageJson(root, projectName, params)
+  setPackageJsonName(root, projectName, params)
   saveInfo(root, projectName, params)
   gitInit(root, projectName, params)
   printSuccess(root, projectName, params)
@@ -68,6 +68,12 @@ function cloneFromGit(root, projectName, params, isUpdate) {
   if (isUpdate) {
     fs.copySync(path.join(shadowPath, 'config/webpack'), path.join(root, 'config/webpack'))
     fs.copySync(path.join(shadowPath, 'config/webpack.js'), path.join(root, 'config/webpack.js'))
+
+    if (params['with_public']) {
+      fs.copySync(path.join(shadowPath, 'public'), path.join(root, 'public'))
+    }
+
+    updatePackageJson(root, shadowPath)
   } else {
     fs.removeSync(path.join(shadowPath, '.git'))
     fs.removeSync(path.join(shadowPath, 'package-lock.json'))
@@ -191,17 +197,50 @@ function updateBabelrc(root, ui) {
   }
   if (uiLib) {
     const babelrcPath = path.join(root, '.babelrc')
-    const babelrc = JSON.parse(fs.readFileSync(babelrcPath, 'utf8'))
+    const babelrc = readJSONFile(babelrcPath)
     babelrc.plugins.push(['import', { libraryName: uiLib, libraryDirectory: 'lib', style: true }])
-    fs.writeFileSync(babelrcPath, JSON.stringify(babelrc, null, 2))
+    writeJSONFile(babelrcPath, babelrc)
   }
 }
 
-function updatePackageJson(root, projectName, params) {
+function setPackageJsonName(root, projectName, params) {
   const pkgPath = path.join(root, 'package.json')
-  const pkg = require(pkgPath)
+  const pkg = readJSONFile(pkgPath)
   pkg.name = projectName
-  pkg.name = fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2))
+  writeJSONFile(pkgPath, pkg)
+}
+
+function readJSONFile(path) {
+  return JSON.parse(fs.readFileSync(path, 'utf8'))
+}
+
+function writeJSONFile(path, content) {
+  fs.writeFileSync(path, JSON.stringify(content, null, 2))
+}
+
+function updatePackageJson(root, shadowPath) {
+  const pkgPath = path.join(root, 'package.json')
+  const pkg = readJSONFile(pkgPath)
+  const newPkg = readJSONFile(path.join(shadowPath, 'package.json'))
+  let shouldUpdate = false
+  Object.keys(newPkg.dependencies).forEach(function (key) {
+    if (pkg.dependencies[key] !== newPkg.dependencies[key]) {
+      pkg.dependencies[key] = newPkg.dependencies[key]
+      shouldUpdate = true
+    }
+  })
+  Object.keys(newPkg.devDependencies).forEach(function (key) {
+    if (pkg.devDependencies[key] !== newPkg.devDependencies[key]) {
+      pkg.devDependencies[key] = newPkg.devDependencies[key]
+      shouldUpdate = true
+    }
+  })
+  if (shouldUpdate) {
+    writeJSONFile(pkgPath, pkg)
+    exec(`npm i --loglevel=error`, { cwd: root })
+  } else {
+    console.log('no npm package update')
+  }
 }
 
 function printSuccess(root, projectName, params, isUpdate) {
@@ -256,7 +295,7 @@ function saveInfo(root, projectName, params) {
   if (params.classic) {
     info.classic = params.classic
   }
-  fs.writeFileSync(infoPath, JSON.stringify(info, null, 2))
+  writeJSONFile(infoPath, info)
 }
 
 exports.create = create

@@ -17,7 +17,8 @@ program.version(pkg.version)
 program
   .command('update')
   .description('升级当前工程')
-  .action(function () {
+  .option('--with_public', '同时更新 public 目录', true)
+  .action(function (options) {
     root = process.cwd()
     const configPath = path.join(root, '.gem-mine')
     if (!fs.existsSync(configPath)) {
@@ -28,6 +29,7 @@ program
     checkGoon(`对项目使用的 gem-mine 脚手架进行升级?`, true).then(function (params) {
       if (params.goon) {
         const config = JSON.parse(fs.readFileSync(configPath, 'utf8'))
+        config['with_public'] = options['with_public']
         utils.updateProject(root, config.name, config)
       } else {
         console.log(`${chalk.red('\n  您主动终止了操作')}`)
@@ -68,7 +70,7 @@ function checkGoon(msg, defaultValue) {
     message: msg,
     choices: [
       {
-        name: '继续进行（和脚手架相关文件将会被覆盖处理）',
+        name: '继续进行（和脚手架相关文件将会被覆盖处理，请确保文件已经 git commit）',
         value: true
       },
       {
