@@ -17,7 +17,6 @@ program.version(pkg.version)
 program
   .command('update')
   .description('升级当前工程')
-  .option('--with_public', '同时更新 public 目录', true)
   .action(function (options) {
     root = process.cwd()
     const configPath = path.join(root, '.gem-mine')
@@ -26,16 +25,22 @@ program
       process.exit(1)
     }
 
-    checkGoon(`对项目使用的 gem-mine 脚手架进行升级?`, true).then(function (params) {
-      if (params.goon) {
+    checkGoon(`对项目使用的 gem-mine 脚手架进行升级?`, true)
+      .then(function (params) {
+        if (params.goon) {
+          return updateOptions()
+        } else {
+          console.log(`${chalk.red('\n  您主动终止了操作')}`)
+          process.exit(1)
+        }
+      })
+      .then(function (params) {
+        const type = params.update
         const config = JSON.parse(fs.readFileSync(configPath, 'utf8'))
-        config['with_public'] = options['with_public']
+        config.update = type
         utils.updateProject(root, config.name, config)
-      } else {
-        console.log(`${chalk.red('\n  您主动终止了操作')}`)
-        process.exit(1)
-      }
-    })
+        utils.report(config)
+      })
   })
 program
   .command('*')
@@ -79,6 +84,34 @@ function checkGoon(msg, defaultValue) {
       }
     ],
     default: defaultValue
+  })
+}
+
+function updateOptions() {
+  const TYPE = constant.UPDATE
+  return inquirer.prompt({
+    type: 'list',
+    name: 'update',
+    message: '请选择更新的类型',
+    choices: [
+      {
+        name: '只更新 webpack 相关配置',
+        value: TYPE.WEBPACK
+      },
+      {
+        name: '更新 webpack 相关配置，以及 public 目录',
+        value: TYPE.PUBLIC
+      },
+      {
+        name: '更新 除了源码（src目录）外的所有信息（推荐）',
+        value: TYPE.CORE
+      },
+      {
+        name: '更新 gem-mine 涉及的所有信息（包括 src 目录）',
+        value: TYPE.ALL
+      }
+    ],
+    default: TYPE.CORE
   })
 }
 

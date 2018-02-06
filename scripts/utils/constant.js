@@ -25,6 +25,13 @@ exports.UI_DOC = {
   [FISH_MOBILE]: FISH_MOBILE_DOC
 }
 
+exports.UPDATE = {
+  WEBPACK: 'webpack',
+  PUBLIC: 'public',
+  CORE: 'core',
+  ALL: 'all'
+}
+
 const REPO = 'https://github.com/gem-mine/gem-mine-template.git'
 exports.REPO = REPO
 

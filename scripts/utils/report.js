@@ -3,7 +3,7 @@ const os = require('os')
 const helper = require('./helper')
 const url = 'http://cors.zmei.me/google'
 
-function report(data) {
+function report(data, isUpdate) {
   data.author = helper.exec('git config user.name', false)
   data.email = helper.exec('git config user.email', false)
 
@@ -16,6 +16,7 @@ function report(data) {
   })
   data.system = system
   data.node = process.version
+  data.isUpdate = isUpdate
 
   request.post(url, {
     json: { data }

@@ -12,7 +12,6 @@ const exec = helper.exec
 function create(root, projectName, params) {
   checkProjectName(root, projectName, params)
   cloneFromGit(root, projectName, params)
-  installClassic(root, projectName, params)
   installDeps(root, projectName, params)
   setPackageJsonName(root, projectName, params)
   saveInfo(root, projectName, params)
@@ -22,6 +21,7 @@ function create(root, projectName, params) {
 
 function update(root, projectName, params) {
   cloneFromGit(root, projectName, params, true)
+  cleanBuild(root, projectName, params)
   printSuccess(root, projectName, params, true)
 }
 
@@ -66,19 +66,39 @@ function cloneFromGit(root, projectName, params, isUpdate) {
   }
 
   if (isUpdate) {
-    fs.copySync(path.join(shadowPath, 'config/webpack'), path.join(root, 'config/webpack'))
-    fs.copySync(path.join(shadowPath, 'config/webpack.js'), path.join(root, 'config/webpack.js'))
-
-    if (params['with_public']) {
-      fs.copySync(path.join(shadowPath, 'public'), path.join(root, 'public'))
+    const type = params.update
+    const TYPE = constant.UPDATE
+    if (type === TYPE.WEBPACK || type === TYPE.PUBLIC) {
+      fs.copySync(path.join(shadowPath, 'config/webpack'), path.join(root, 'config/webpack'))
+      fs.copySync(path.join(shadowPath, 'config/webpack.js'), path.join(root, 'config/webpack.js'))
+      if (type === TYPE.PUBLIC) {
+        fs.copySync(path.join(shadowPath, 'config/webpack'), path.join(root, 'config/webpack'))
+        fs.copySync(path.join(shadowPath, 'config/webpack.js'), path.join(root, 'config/webpack.js'))
+        fs.copySync(path.join(shadowPath, 'public'), path.join(root, 'public'))
+      }
+    } else {
+      copyProject(root, projectName, params, shadowPath, type === TYPE.ALL, true)
     }
-
     updatePackageJson(root, shadowPath)
+    updateBabelrc(root, params.ui)
   } else {
-    fs.removeSync(path.join(shadowPath, '.git'))
-    fs.removeSync(path.join(shadowPath, 'package-lock.json'))
-    fs.removeSync(path.join(shadowPath, 'manifest.json'))
+    copyProject(root, projectName, params, shadowPath, true)
+  }
+  fs.removeSync(shadowPath)
+}
 
+function copyProject(root, projectName, params, shadowPath, copySrc, isUpdate) {
+  const ignores = ['manifest.json', '.git', 'src', 'package-lock.json']
+  if (isUpdate) {
+    ignores.push('package.json')
+  }
+  fs.readdirSync(shadowPath).forEach(function (name) {
+    if (ignores.indexOf(name) === -1) {
+      fs.copySync(path.join(shadowPath, name), path.join(root, name))
+    }
+  })
+
+  if (copySrc) {
     let ui = params.ui
     const uiExamplePath = path.join(shadowPath, 'src/components/examples/ui')
     if (ui) {
@@ -88,10 +108,10 @@ function cloneFromGit(root, projectName, params, isUpdate) {
       fs.copySync(path.join(uiExamplePath, 'tpl', ui, 'index.jsx'), path.join(uiExamplePath, 'index.jsx'))
     }
     fs.removeSync(path.join(uiExamplePath, 'tpl'))
+    fs.copySync(path.join(shadowPath, 'src'), path.join(root, 'src'))
 
-    fs.copySync(shadowPath, root)
+    installClassic(root, projectName, params)
   }
-  fs.removeSync(shadowPath)
 }
 
 function installClassic(root, projectName, params) {
@@ -111,14 +131,8 @@ function installClassic(root, projectName, params) {
       exec(`git clone ${constant.CLASSIC_REPO} ${shadowPath} --depth=1 --no-single-branch`)
 
       exec(`git checkout ${branch}`, { cwd: shadowPath, silent: true })
-
-      fs.removeSync(path.join(shadowPath, '.git'))
-      fs.removeSync(path.join(shadowPath, '.gitignore'))
-      fs.removeSync(path.join(shadowPath, '.eslintignore'))
-      fs.removeSync(path.join(shadowPath, '.eslintrc'))
-      fs.removeSync(path.join(shadowPath, 'package-lock.json'))
-      fs.removeSync(path.join(shadowPath, 'package.json'))
-      fs.copySync(shadowPath, root)
+      fs.copySync(path.resolve(shadowPath, 'config'), path.resolve(root, 'config'))
+      fs.copySync(path.resolve(shadowPath, 'src'), path.resolve(root, 'src'))
       fs.removeSync(shadowPath)
     }
   }
@@ -222,25 +236,42 @@ function updatePackageJson(root, shadowPath) {
   const pkgPath = path.join(root, 'package.json')
   const pkg = readJSONFile(pkgPath)
   const newPkg = readJSONFile(path.join(shadowPath, 'package.json'))
+  let shouldInstall = false
   let shouldUpdate = false
   Object.keys(newPkg.dependencies).forEach(function (key) {
     if (pkg.dependencies[key] !== newPkg.dependencies[key]) {
       pkg.dependencies[key] = newPkg.dependencies[key]
-      shouldUpdate = true
+      shouldInstall = true
     }
   })
   Object.keys(newPkg.devDependencies).forEach(function (key) {
     if (pkg.devDependencies[key] !== newPkg.devDependencies[key]) {
       pkg.devDependencies[key] = newPkg.devDependencies[key]
+      shouldInstall = true
+    }
+  })
+  Object.keys(newPkg.scripts).forEach(function (key) {
+    if (pkg.scripts[key] !== newPkg.scripts[key]) {
+      pkg.scripts[key] = newPkg.scripts[key]
       shouldUpdate = true
     }
   })
-  if (shouldUpdate) {
+  if (shouldInstall || shouldUpdate) {
     writeJSONFile(pkgPath, pkg)
-    exec(`npm i --loglevel=error`, { cwd: root })
+    if (shouldInstall) {
+      exec(`npm i --loglevel=error`, { cwd: root })
+    }
   } else {
     console.log('no npm package update')
   }
+}
+
+function cleanBuild(root, projectName, params) {
+  try {
+    const config = require(path.resolve(root, 'config/webpack.js'))
+    let buildPath = config.buildPath || path.resolve(root, 'build')
+    fs.removeSync(buildPath)
+  } catch (e) {}
 }
 
 function printSuccess(root, projectName, params, isUpdate) {
