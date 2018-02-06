@@ -39,7 +39,8 @@ program
         const config = JSON.parse(fs.readFileSync(configPath, 'utf8'))
         config.update = type
         utils.updateProject(root, config.name, config)
-        utils.report(config)
+        config.projectName = config.name
+        utils.report(config, true)
       })
   })
 program
