@@ -1,6 +1,6 @@
 {
   "name": "gem-mine",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "a fantastic react boilerplate ",
   "keywords": [
     "react",
@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "chalk": "^2.3.0",
+    "command-exists": "^1.2.2",
     "commander": "^2.11.0",
     "figlet": "^1.2.0",
     "fs-extra": "^5.0.0",
@@ -36,7 +37,6 @@
   },
   "devDependencies": {
     "babel-eslint": "^8.1.2",
-    "command-exists": "^1.2.2",
     "eslint": "^4.14.0",
     "eslint-config-standard": "^11.0.0-beta.0",
     "eslint-config-standard-react": "^5.0.0",
