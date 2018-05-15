@@ -174,15 +174,12 @@ function installDeps(root, projectName, params) {
   if (params.ie8) {
     v = '0.14.9'
   } else {
-    if (params.ui === constant.FISH) {
-      v = '^15.0.0'
-    } else {
-      v = 'latest'
-    }
+    v = 'latest'
   }
   exec(`npm i react@${v} react-dom@${v} --save --loglevel=error`, { cwd: root })
+  // 非 IE8 下安装的 react 已经不内置 prop-types 和 create-react-class，都需要单独安装，已处理兼容性问题
   if (!params.ie8) {
-    exec(`npm i prop-types --save --loglevel=error`, { cwd: root })
+    exec(`npm i prop-types create-react-class --save --loglevel=error`, { cwd: root })
   }
 
   const ui = params.ui
