@@ -8,6 +8,11 @@ const pkg = require('../package.json')
 const utils = require('./utils')
 const inquirer = require('inquirer')
 const constant = require('./utils/constant')
+const helper = require('./utils/helper')
+const { UPDATE_ITEMS } = require('./utils/update_items')
+
+const readJSONFile = helper.readJSONFile
+const exec = helper.exec
 
 utils.initCheck()
 let root, projectName
@@ -25,19 +30,19 @@ program
       process.exit(1)
     }
 
+    const config = JSON.parse(fs.readFileSync(configPath, 'utf8'))
     checkGoon(`对项目使用的 gem-mine 脚手架进行升级?`, true)
       .then(function (params) {
         if (params.goon) {
-          return updateOptions()
+          return updateOptions(root, config)
         } else {
           console.log(`${chalk.red('\n  您主动终止了操作')}`)
           process.exit(1)
         }
       })
       .then(function (params) {
-        const type = params.update
-        const config = JSON.parse(fs.readFileSync(configPath, 'utf8'))
-        config.update = type
+        const items = params.update
+        config.items = items
         utils.updateProject(root, config.name, config)
         config.projectName = config.name
         utils.report(config, true)
@@ -88,31 +93,45 @@ function checkGoon(msg, defaultValue) {
   })
 }
 
-function updateOptions() {
-  const TYPE = constant.UPDATE
+function updateOptions(root, config) {
+  const pkgPath = path.join(root, 'package-lock.json')
+  const pkg = readJSONFile(pkgPath)
+
+  // 检测 template 的版本，如果不一致，提示更新，包括两个部分：
+  const localTemplateVersion = pkg.template_version
+  const remoteTemplateVersion = exec(`npm show gem-mine-template version`, false)
+  const versionFlag = localTemplateVersion !== remoteTemplateVersion
+  console.log('\n正在获取工程代码骨架版本...')
+  if (versionFlag) {
+    let msg
+    if (!localTemplateVersion) {
+      msg = '本地未获取到工程代码骨架版本'
+    } else {
+      msg = `本地代码骨架版本为 ${chalk.red(localTemplateVersion)}`
+    }
+    console.log(`${msg}，当前最新代码工程代码骨架版本为 ${chalk.green(remoteTemplateVersion)}`)
+    console.log(`版本履历可以通过此链接查看：\n\n${chalk.green('http://gem-mine.club/#/docs/version')}\n\n`)
+  }
+
+  if (config.ui) {
+    console.log(`正在获取 ${config.ui.replace(constant.SDP_PREFIX, '')} 最新版本号...\n`)
+    const prevVersion = pkg.dependencies[config.ui].version
+    const currVersion = exec(`npm show ${config.ui} version`, false)
+    if (currVersion !== prevVersion) {
+      UPDATE_ITEMS.push({
+        name: `UI 库（${config.ui.replace(constant.SDP_PREFIX, '')}@${prevVersion}）升级到最新版本 ${currVersion}，${chalk.green('建议更新')}`,
+        value: 'ui',
+        checked: true
+      })
+    }
+  }
+
   return inquirer.prompt({
-    type: 'list',
+    type: 'checkbox',
     name: 'update',
-    message: '请选择更新的类型',
-    choices: [
-      {
-        name: '只更新 webpack 相关配置',
-        value: TYPE.WEBPACK
-      },
-      {
-        name: '更新 webpack 相关配置，以及 public 目录',
-        value: TYPE.PUBLIC
-      },
-      {
-        name: '更新 除了源码（src目录）外的所有信息（推荐）',
-        value: TYPE.CORE
-      },
-      {
-        name: '更新 gem-mine 涉及的所有信息（包括 src 目录）',
-        value: TYPE.ALL
-      }
-    ],
-    default: TYPE.CORE
+    message: '请选择要更新的目录或文件',
+    pageSize: UPDATE_ITEMS.length,
+    choices: UPDATE_ITEMS
   })
 }
 
@@ -124,10 +143,6 @@ function run(root, projectName, _cache) {
       if (data.platform === constant.MOBILE) {
         return utils.step.mobile.ui().then(function (data) {
           if (data.ui) {
-            if (data.ui === constant.FISH_MOBILE) {
-              console.log(chalk.red(`该 UI 库尚未完成，想贡献力量？请联系 ${constant.EMAIL}`))
-              process.exit(1)
-            }
             _cache.ui = data.ui
           }
         })

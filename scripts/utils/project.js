@@ -6,8 +6,11 @@ const os = require('os')
 const figlet = require('figlet')
 const helper = require('./helper')
 const constant = require('./constant')
+const { updateProject } = require('./update_items')
 
 const exec = helper.exec
+const writeJSONFile = helper.writeJSONFile
+const readJSONFile = helper.readJSONFile
 
 function create(root, projectName, params) {
   checkProjectName(root, projectName, params)
@@ -66,20 +69,14 @@ function cloneFromGit(root, projectName, params, isUpdate) {
   }
 
   if (isUpdate) {
-    const type = params.update
-    const TYPE = constant.UPDATE
-    if (type === TYPE.WEBPACK || type === TYPE.PUBLIC) {
-      fs.copySync(path.join(shadowPath, 'config/webpack'), path.join(root, 'config/webpack'))
-      fs.copySync(path.join(shadowPath, 'config/webpack.js'), path.join(root, 'config/webpack.js'))
-      if (type === TYPE.PUBLIC) {
-        fs.copySync(path.join(shadowPath, 'config/webpack'), path.join(root, 'config/webpack'))
-        fs.copySync(path.join(shadowPath, 'config/webpack.js'), path.join(root, 'config/webpack.js'))
-        fs.copySync(path.join(shadowPath, 'public'), path.join(root, 'public'))
+    const items = params.items
+    items.forEach(function (key) {
+      const fn = updateProject[key]
+      if (fn) {
+        fn(shadowPath, root)
       }
-    } else {
-      copyProject(root, projectName, params, shadowPath, type === TYPE.ALL, true)
-    }
-    updatePackageJson(root, shadowPath)
+    })
+    updatePackageJson(root, shadowPath, params)
     updateBabelrc(root, params.ui)
   } else {
     copyProject(root, projectName, params, shadowPath, true)
@@ -170,6 +167,7 @@ function gitInit(root, projectName, params) {
 }
 
 function installDeps(root, projectName, params) {
+  const ui = params.ui
   let v
   if (params.ie8) {
     v = '0.14.9'
@@ -177,12 +175,11 @@ function installDeps(root, projectName, params) {
     v = 'latest'
   }
   exec(`npm i react@${v} react-dom@${v} --save --loglevel=error`, { cwd: root })
-  // 非 IE8 下安装的 react 已经不内置 prop-types 和 create-react-class，都需要单独安装，已处理兼容性问题
+  // 非 IE8 下安装的 react 已经不内置 prop-types 和 create-react-class，都需要单独安装，以处理兼容性问题
   if (!params.ie8) {
     exec(`npm i prop-types create-react-class --save --loglevel=error`, { cwd: root })
   }
 
-  const ui = params.ui
   if (ui) {
     if (ui.indexOf(constant.SDP_PREFIX) === 0) {
       exec(`npm i ${ui} --save --registry=http://registry.npm.sdp.nd --loglevel=error`, { cwd: root })
@@ -221,20 +218,41 @@ function setPackageJsonName(root, projectName, params) {
   writeJSONFile(pkgPath, pkg)
 }
 
-function readJSONFile(path) {
-  return JSON.parse(fs.readFileSync(path, 'utf8'))
+function checkAndUpdatePkg(root, name, pkg) {
+  const latest = exec(`npm show ${name} version`, false)
+  let now
+  if (pkg[name]) {
+    now = pkg[name].replace(/^\D+/, '')
+  }
+  if (latest !== now) {
+    exec(`npm i ${name}@latest --save --loglevel=error`, { cwd: root })
+  }
 }
 
-function writeJSONFile(path, content) {
-  fs.writeFileSync(path, JSON.stringify(content, null, 2))
-}
-
-function updatePackageJson(root, shadowPath) {
+function updatePackageJson(root, shadowPath, params) {
+  console.log('\n正在更新项目依赖包（package.json 中声明的依赖）...\n')
   const pkgPath = path.join(root, 'package.json')
   const pkg = readJSONFile(pkgPath)
   const newPkg = readJSONFile(path.join(shadowPath, 'package.json'))
   let shouldInstall = false
   let shouldUpdate = false
+
+  // 非 IE8 项目保持 react、react-dom、prop-types、create-react-class 最新版本
+  if (!params.ie8) {
+    const arr = ['react', 'react-dom', 'prop-types', 'create-react-class']
+    arr.forEach(name => {
+      checkAndUpdatePkg(root, name, pkg.dependencies)
+    })
+  }
+
+  const ui = params.ui
+  if (ui) {
+    checkAndUpdatePkg(root, ui, pkg.dependencies)
+    if (ui === constant.ANTD_MOBILE || ui === constant.FISH_MOBILE) {
+      checkAndUpdatePkg(root, 'rc-form', pkg.dependencies)
+    }
+  }
+
   Object.keys(newPkg.dependencies).forEach(function (key) {
     if (pkg.dependencies[key] !== newPkg.dependencies[key]) {
       pkg.dependencies[key] = newPkg.dependencies[key]
@@ -258,8 +276,9 @@ function updatePackageJson(root, shadowPath) {
     if (shouldInstall) {
       exec(`npm i --loglevel=error`, { cwd: root })
     }
+    console.log('更新项目依赖包成功\n')
   } else {
-    console.log('no npm package update')
+    console.log('项目中的依赖已经和 gem-mine-template 中一致，无须更新')
   }
 }
 
