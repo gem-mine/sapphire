@@ -1,9 +1,6 @@
-const inquirer = require('inquirer')
-const constant = require('../../constant')
-const FISH = constant.FISH
-const ANTD = constant.ANTD
+const { FISH, ANTD } = require('../../constant/ui')
 
-function run(ie8) {
+module.exports = function (ie8) {
   const choices = [
     {
       name: 'fish（需要在内网）',
@@ -12,7 +9,7 @@ function run(ie8) {
   ]
   if (!ie8) {
     choices.push({
-      name: 'ant design（仅供学习使用）',
+      name: 'ant design',
       value: ANTD
     })
   }
@@ -20,12 +17,10 @@ function run(ie8) {
     name: '无',
     value: ''
   })
-  return inquirer.prompt({
+  return {
     type: 'list',
     name: 'ui',
     message: '选择 UI 组件库:',
-    choices: choices
-  })
+    choices
+  }
 }
-
-module.exports = run

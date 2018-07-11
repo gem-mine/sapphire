@@ -18,6 +18,13 @@
     "mocha": true
   },
   "rules": {
-    "space-before-function-paren": [2, { "anonymous": "always", "named": "never" }]
+    "space-before-function-paren": [
+      2,
+      {
+        "anonymous": "always",
+        "named": "never"
+      }
+    ],
+    "object-curly-spacing": [2, "always", { "objectsInObjects": false }]
   }
 }

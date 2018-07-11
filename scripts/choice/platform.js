@@ -1,21 +1,19 @@
-const inquirer = require('inquirer')
+const { PC, MOBILE } = require('../../constant/core')
 
-function run() {
-  return inquirer.prompt({
+module.exports = function () {
+  return {
     type: 'list',
     name: 'platform',
     message: '请选择项目运行的平台类型:',
     choices: [
       {
         name: 'PC 端',
-        value: 'pc'
+        value: PC
       },
       {
         name: '移动端',
-        value: 'mobile'
+        value: MOBILE
       }
     ]
-  })
+  }
 }
-
-module.exports = run
