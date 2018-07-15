@@ -1,10 +1,6 @@
 const PRIVATE_KEY = ['set', 'get', 'del']
 
-const context = {
-  id: `${Date.now()}${String.fromCharCode(Math.ceil(Math.random() * (90 - 65)) + 65)}${Math.ceil(
-    Math.random() * Math.pow(10, 10)
-  )}`
-}
+const context = {}
 
 function defineProperty(object, key, fn) {
   Object.defineProperty(object, key, {
