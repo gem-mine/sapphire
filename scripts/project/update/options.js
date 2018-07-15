@@ -1,9 +1,9 @@
 const chalk = require('chalk')
 const fs = require('fs-extra')
 const path = require('path')
-const { execWithProcess } = require('gem-mine-helper')
-const { getUIName } = require('../../../utils/project/sdp')
-const { cloneClassic } = require('../../../utils/project/git')
+const { execWithProcess, getUIName } = require('gem-mine-helper')
+const { cloneClassic, copySrc } = require('../../../utils/project/git')
+const updateBabelrc = require('../../../utils/project/babelrc')
 
 const MSG = {
   WEBPACK: 'webpack 相关配置（webpack.config.js、config/webpack.js 以及 config/webpack目录）',
@@ -95,7 +95,7 @@ exports.updateProject = {
     updateSuccessMsg(MSG.WEBPACK)
   },
   [OPTIONS.PROJECT_CONFIG.value]: function (context) {
-    const { shadow_path: shadowPath, root } = context
+    const { ui, shadow_path: shadowPath, root } = context
     const files = fs.readdirSync(shadowPath)
     files.forEach(function (name) {
       const stats = fs.statSync(path.resolve(shadowPath, name))
@@ -103,6 +103,9 @@ exports.updateProject = {
         copy(shadowPath, root, name)
       }
     })
+    if (ui) {
+      updateBabelrc(context)
+    }
     updateSuccessMsg(MSG.PROJECT_CONFIG)
   },
   [OPTIONS.OTHER_CONFIG.value]: function (context) {
@@ -121,8 +124,7 @@ exports.updateProject = {
     updateSuccessMsg(MSG.PUBLIC)
   },
   [OPTIONS.SRC.value]: function (context) {
-    const { shadow_path: shadowPath, root } = context
-    copy(shadowPath, root, 'src')
+    copySrc(context)
     updateSuccessMsg(MSG.SRC)
   },
   [OPTIONS.UTIL.value]: function (context) {

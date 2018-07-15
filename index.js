@@ -2,22 +2,23 @@
 
 const program = require('commander')
 const os = require('os')
-const { checkGit, checkNodeVersion, checkNpmRegistry } = require('./utils/env')
-const { checkCliVersion } = require('./utils/project/version')
+const { checkGit, checkNodeVersion } = require('./utils/env')
 const regInstallScript = require('./scripts/project/install')
 const regUpdateScript = require('./scripts/project/update')
 const pkg = require('./package.json')
 const context = require('./context')
-const { EXIT_CODE } = require('./constant/core')
-const { exec } = require('gem-mine-helper')
-const { gitInit } = require('./utils/project/git')
-const { saveInfo } = require('./utils/project/info')
-const { printSuccess, printError } = require('./utils/project/print')
+const { exec, autoSetRegistry } = require('gem-mine-helper')
+const { listen } = require('./utils/project/report')
 
-// 检查环境
+// 注册退出的事件监听
+listen()
+
+// 检查环境再开始执行
 checkNodeVersion()
 checkGit()
-checkNpmRegistry()
+
+// 自动切换 npm 源
+autoSetRegistry()
 
 // 一些环境信息收集
 context.set({
@@ -36,26 +37,3 @@ regInstallScript(program, pkg)
 regUpdateScript(program, pkg)
 
 program.parse(process.argv)
-
-process.on('exit', function (code) {
-  if (
-    Object.keys(EXIT_CODE)
-      .map(function (key) {
-        return EXIT_CODE[key]
-      })
-      .includes(code)
-  ) {
-    if (code === EXIT_CODE.SUCCESS) {
-      saveInfo(context) // 保存信息
-      gitInit(context) // git init
-      printSuccess(context) // success
-      // report
-      console.log(context)
-    } else if (code === EXIT_CODE.ERROR) {
-      printError(context)
-      // report
-    } else {
-    }
-    checkCliVersion(context, pkg)
-  }
-})

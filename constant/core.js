@@ -1,12 +1,12 @@
 /**
  * gem-mine 相关常量
  */
+const { CONSTANT } = require('gem-mine-helper')
 
 const GEM_MINE_DOC = 'http://gem-mine.club'
 const GEM_MINE_DOC_VERSION = `${GEM_MINE_DOC}/#/docs/version`
 
-// const REPO = 'https://github.com/gem-mine/gem-mine-template.git'
-const REPO = '~/nd/my-pure/gem-mine-template'
+const REPO = 'https://github.com/gem-mine/gem-mine-template.git'
 const CLASSIC_REPO = {
   ADMIN: 'https://github.com/gem-mine/gem-mine-admin.git'
 }
@@ -22,10 +22,10 @@ exports.GEM_MINE_DOC_VERSION = GEM_MINE_DOC_VERSION
 exports.REPO = REPO
 exports.CLASSIC_REPO = CLASSIC_REPO
 
-exports.IE8 = 'ie8'
-exports.MORDEN = 'morden'
-exports.MOBILE = 'mobile'
-exports.PC = 'pc'
+exports.IE8 = CONSTANT.IE8
+exports.MORDEN = CONSTANT.MORDEN
+exports.MOBILE = CONSTANT.MOBILE
+exports.PC = CONSTANT.PC
 exports.EMAIL = EMAIL
 
 exports.COMMAND = COMMAND

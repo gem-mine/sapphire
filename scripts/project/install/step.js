@@ -11,6 +11,7 @@ const choice = {
 const { MOBILE, PC, EXIT_CODE, CUSTOM, IE8, MORDEN } = require('../../../constant/core')
 const { cloneTemplate, copyProject } = require('../../../utils/project/git')
 const { installDeps, setPackageJsonName } = require('../../../utils/project/package')
+const report = require('../../../utils/project/report')
 
 module.exports = function () {
   // 选择平台
@@ -58,36 +59,38 @@ module.exports = function () {
             })
           })
           .then(function (result) {
-            if (result === CUSTOM) {
-              return prompt(choice.custom.git(context))
-                .then(function (data) {
-                  const { git } = data
-                  return prompt(choice.custom.branch(context)).then(function (data) {
-                    const { branch } = data
-                    return { git, branch }
+            if (result) {
+              if (result === CUSTOM) {
+                return prompt(choice.custom.git(context))
+                  .then(function (data) {
+                    const { git } = data
+                    return prompt(choice.custom.branch(context)).then(function (data) {
+                      const { branch } = data
+                      return { git, branch }
+                    })
                   })
-                })
-                .then(function (data) {
-                  const { git, branch } = data
-                  context.set({
-                    classic_git: git,
-                    classic_branch: branch || 'master'
+                  .then(function (data) {
+                    const { git, branch } = data
+                    context.set({
+                      classic_git: git,
+                      classic_branch: branch || 'master'
+                    })
                   })
-                })
-            } else {
-              const defaultBranch = 'master'
-              let git, branch
-              if (typeof result === 'string') {
-                git = result
-                branch = defaultBranch
               } else {
-                git = result.git
-                branch = result.branch || defaultBranch
+                const defaultBranch = 'master'
+                let git, branch
+                if (typeof result === 'string') {
+                  git = result
+                  branch = defaultBranch
+                } else {
+                  git = result.git
+                  branch = result.branch || defaultBranch
+                }
+                context.set({
+                  classic_git: git,
+                  classic_branch: branch
+                })
               }
-              context.set({
-                classic_git: git,
-                classic_branch: branch
-              })
             }
           })
       }
@@ -97,14 +100,15 @@ module.exports = function () {
       copyProject(context) // 拷贝需要的代码
       installDeps(context) // 安装依赖
       setPackageJsonName(context) // 更新 package.json 的 name
-      process.exit(EXIT_CODE.SUCCESS)
+      context.set('exit_code', EXIT_CODE.SUCCESS)
+      report.emit(context)
     })
     .catch(function (e) {
       context.set({
         error: true,
-        message: e.message
+        message: e.message,
+        exit_code: EXIT_CODE.ERROR
       })
       console.error(e)
-      process.exit(EXIT_CODE.ERROR)
     })
 }

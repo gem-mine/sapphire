@@ -2,11 +2,13 @@ const chalk = require('chalk')
 const { prompt } = require('inquirer')
 const context = require('../../../context')
 const { getInfo } = require('../../../utils/project/info')
+const { genId } = require('../../../utils/project')
 const { COMMAND, TYPE, EXIT_CODE } = require('../../../constant/core')
 const choice = {
   goon: require('../../choice/goon')
 }
 const step = require('./step')
+const report = require('../../../utils/project/report')
 
 module.exports = function (program) {
   program
@@ -19,6 +21,9 @@ module.exports = function (program) {
         command: COMMAND.UPDATE,
         root
       })
+      if (!context.get('id')) {
+        context.set('id', genId())
+      }
 
       context.set(getInfo(context))
 
@@ -27,7 +32,8 @@ module.exports = function (program) {
           step()
         } else {
           console.log(`\n${chalk.red('您主动终止了操作')}`)
-          process.exit(EXIT_CODE.ABORT)
+          context.set('exit_code', EXIT_CODE.ABORT)
+          report.emit(context)
         }
       })
     })

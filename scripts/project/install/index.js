@@ -8,7 +8,8 @@ const choice = {
 const context = require('../../../context')
 const { COMMAND, TYPE, EXIT_CODE } = require('../../../constant/core')
 const step = require('./step')
-const { checkProjectName } = require('../../../utils/project')
+const { checkProjectName, genId } = require('../../../utils/project')
+const report = require('../../../utils/project/report')
 
 module.exports = function (program, pkg) {
   program
@@ -20,9 +21,7 @@ module.exports = function (program, pkg) {
       checkProjectName(projectName) // 检测工程名称是否合法
 
       context.set({
-        id: `${Date.now()}${String.fromCharCode(Math.ceil(Math.random() * 25) + 65)}${Math.ceil(
-          Math.random() * Math.pow(10, 10)
-        )}`,
+        id: genId(),
         type: TYPE.PROJECT,
         command: COMMAND.INSTALL,
         root,
@@ -36,7 +35,8 @@ module.exports = function (program, pkg) {
             step()
           } else {
             console.log(`${chalk.red('\n  您主动终止了操作')}`)
-            process.exit(EXIT_CODE.ABORT)
+            context.set('exit_code', EXIT_CODE.ABORT)
+            report.emit(context)
           }
         })
       } else {

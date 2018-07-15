@@ -1,9 +1,7 @@
 const path = require('path')
-const { readJSON, writeJSON } = require('../../utils/json')
-const { exec, execWithProcess } = require('gem-mine-helper')
+const { exec, execWithProcess, readJSON, writeJSON, runNpm } = require('gem-mine-helper')
 const { ANTD_MOBILE, FISH_MOBILE } = require('../../constant/ui')
 const updateBabelrc = require('./babelrc')
-const runNpm = require('./npm')
 
 /**
  * 安装依赖
@@ -40,6 +38,9 @@ function installDeps(context) {
   execWithProcess(`npm i --loglevel=error`, { cwd: root })
 }
 
+/**
+ * 设置 package.json 文件中的 name
+ */
 function setPackageJsonName(context) {
   const { root, name: projectName } = context
   const pkgPath = path.join(root, 'package.json')
@@ -48,6 +49,9 @@ function setPackageJsonName(context) {
   writeJSON(pkgPath, pkg)
 }
 
+/**
+ * 检测某个 npm 包是否是最新版本，非最新则更新
+ */
 function checkAndUpdatePkg(root, name, pkg) {
   const latest = runNpm(`npm show ${name} version`)
   let now
@@ -56,9 +60,14 @@ function checkAndUpdatePkg(root, name, pkg) {
   }
   if (latest !== now) {
     execWithProcess(`npm i ${name}@latest --save --loglevel=error`, { cwd: root })
+    return latest
   }
 }
 
+/**
+ * 检测 项目中的依赖 是否和 模板中的依赖 版本一致，非一致情况会更新到 模板中对应的版本
+ * 非 IE8 项目，会对 react、react-dom、prop-types、create-react-class 更新到最新版本
+ */
 function updatePackageJson(context) {
   const { root, shadow_path: shadowPath, ie8, ui } = context
   console.log('\n正在检查更新项目依赖包（package.json 中声明的依赖）...\n')
@@ -72,7 +81,10 @@ function updatePackageJson(context) {
   if (!ie8) {
     const arr = ['react', 'react-dom', 'prop-types', 'create-react-class']
     arr.forEach(name => {
-      checkAndUpdatePkg(root, name, pkg.dependencies)
+      const version = checkAndUpdatePkg(root, name, pkg.dependencies)
+      if (version && name === 'react') {
+        context.set('react_version', version)
+      }
     })
   }
 

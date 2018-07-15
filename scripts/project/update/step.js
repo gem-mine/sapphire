@@ -1,12 +1,11 @@
-const path = require('path')
-const fs = require('fs')
 const { prompt } = require('inquirer')
 const context = require('../../../context')
 const { UIOption, getOptions, updateProject, classicOption } = require('./options')
 const { cloneTemplate } = require('../../../utils/project/git')
 const { updatePackageJson } = require('../../../utils/project/package')
-const { checkTemplateVersion, checkClassicVersion, checkUILib } = require('../../../utils/project/version')
+const { checkTemplateVersion, checkClassicVersion, checkUIVersion } = require('../../../utils/project/version')
 const { EXIT_CODE } = require('../../../constant/core')
+const report = require('../../../utils/project/report')
 
 module.exports = function () {
   const { ui, classic_git: classicGit } = context
@@ -15,7 +14,7 @@ module.exports = function () {
 
   const options = getOptions()
   if (ui) {
-    checkUILib(context, function (localVersion, remoteVersion) {
+    checkUIVersion(context, function (localVersion, remoteVersion) {
       options.push(UIOption(context, localVersion, remoteVersion))
     })
   }
@@ -45,14 +44,15 @@ module.exports = function () {
       })
 
       updatePackageJson(context) // 更新 package.json
-      process.exit(EXIT_CODE.SUCCESS)
+      context.set('exit_code', EXIT_CODE.SUCCESS)
+      report.emit(context)
     })
     .catch(function (e) {
       context.set({
         error: true,
-        message: e.message
+        message: e.message,
+        exit_code: EXIT_CODE.ERROR
       })
       console.error(e)
-      process.exit(EXIT_CODE.ERROR)
     })
 }

@@ -1,6 +1,5 @@
 const path = require('path')
-const { SDP_PREFIX } = require('../../constant/ui')
-const { readJSON, writeJSON } = require('../../utils/json')
+const { readJSON, writeJSON, getUIName } = require('gem-mine-helper')
 
 /**
  * 更新 .babelrc，目的是为了处理 UI 库的按需打包
@@ -8,12 +7,7 @@ const { readJSON, writeJSON } = require('../../utils/json')
 module.exports = function (context) {
   const { root, ui } = context
   if (ui) {
-    let uiLib
-    if (ui.indexOf(SDP_PREFIX) === 0) {
-      uiLib = ui.replace(SDP_PREFIX, '')
-    } else {
-      uiLib = ui
-    }
+    const uiLib = getUIName(ui)
     const babelrcPath = path.join(root, '.babelrc')
     const babelrc = readJSON(babelrcPath)
     babelrc.plugins.push(['import', { libraryName: uiLib, libraryDirectory: 'lib', style: true }])
