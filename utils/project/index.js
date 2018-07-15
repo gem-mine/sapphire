@@ -32,5 +32,12 @@ function cleanBuild(context) {
   } catch (e) {}
 }
 
+function genId() {
+  return `${Date.now()}${String.fromCharCode(Math.ceil(Math.random() * (90 - 65)) + 65)}${Math.ceil(
+    Math.random() * Math.pow(10, 10)
+  )}`
+}
+
 exports.checkProjectName = checkProjectName
 exports.cleanBuild = cleanBuild
+exports.genId = genId
