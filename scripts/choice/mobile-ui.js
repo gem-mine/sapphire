@@ -7,7 +7,7 @@ module.exports = function () {
     message: '选择 UI 组件库:',
     choices: [
       {
-        name: 'fish mobile',
+        name: 'fish mobile（需要在内网）',
         value: FISH_MOBILE
       },
       {
