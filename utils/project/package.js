@@ -3,6 +3,8 @@ const { exec, execWithProcess, readJSON, writeJSON, runNpm } = require('gem-mine
 const { ANTD_MOBILE, FISH_MOBILE } = require('../../constant/ui')
 const updateBabelrc = require('./babelrc')
 
+const REACT_IE8_VERSION = '0.14.9'
+
 /**
  * 安装依赖
  * 1. 根据是否选择 IE8，来决定安装 react 版本
@@ -14,7 +16,7 @@ function installDeps(context) {
   const { root, ui, ie8 } = context
   let reactVersion
   if (ie8) {
-    reactVersion = '0.14.9'
+    reactVersion = REACT_IE8_VERSION
   } else {
     reactVersion = exec(`npm show react version`)
   }
@@ -86,6 +88,8 @@ function updatePackageJson(context) {
         context.set('react_version', version)
       }
     })
+  } else {
+    context.set('react_version', REACT_IE8_VERSION)
   }
 
   if (ui) {
@@ -95,24 +99,39 @@ function updatePackageJson(context) {
     }
   }
 
-  Object.keys(newPkg.dependencies).forEach(function (key) {
-    if (pkg.dependencies[key] !== newPkg.dependencies[key]) {
-      pkg.dependencies[key] = newPkg.dependencies[key]
-      shouldInstall = true
-    }
-  })
-  Object.keys(newPkg.devDependencies).forEach(function (key) {
-    if (pkg.devDependencies[key] !== newPkg.devDependencies[key]) {
-      pkg.devDependencies[key] = newPkg.devDependencies[key]
-      shouldInstall = true
-    }
-  })
-  Object.keys(newPkg.scripts).forEach(function (key) {
-    if (pkg.scripts[key] !== newPkg.scripts[key]) {
-      pkg.scripts[key] = newPkg.scripts[key]
-      shouldUpdate = true
-    }
-  })
+  ;(function(items) {
+    items.forEach(function(item) {
+      const { key, update } = item
+      Object.keys(newPkg[key]).forEach(function(v) {
+        if (pkg[key][v] !== newPkg[key][v]) {
+          pkg[key][v] = newPkg[key][v]
+          if (update) {
+            shouldUpdate = true
+          } else {
+            shouldInstall = true
+          }
+        }
+      })
+    })
+  })([{ key: 'dependencies' }, { key: 'devDependencies' }, { key: 'scripts', update: true }])
+  ;(function(items) {
+    items.forEach(function(item) {
+      const arr = pkg[item] || []
+      const newArr = newPkg[item]
+      if (newArr) {
+        newArr.forEach(function(v) {
+          if (arr.indexOf(v) === -1) {
+            arr.push(v)
+          }
+        })
+      }
+      if (arr !== pkg[item]) {
+        pkg[item] = arr
+        shouldUpdate = true
+      }
+    })
+  })(['pre-commit'])
+
   if (shouldInstall || shouldUpdate) {
     writeJSON(pkgPath, pkg)
     if (shouldInstall) {

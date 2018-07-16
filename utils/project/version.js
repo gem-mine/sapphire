@@ -28,7 +28,7 @@ function checkCliVersion() {
   })
 }
 
-function checkTemplateVersion(context) {
+function checkTemplateVersion(context, callback) {
   console.log('\n正在获取工程代码骨架版本...')
 
   _checkTemplateVersion(context, function ({ localVersion, remoteVersion }) {
@@ -46,6 +46,7 @@ function checkTemplateVersion(context) {
       } else {
         console.log(`工程代码骨架已经是最新版本：${chalk.yellow(localVersion)}\n`)
       }
+      callback(localVersion, remoteVersion)
     } else {
       log.error(`网络异常，未能获取到工程代码骨架`)
     }
