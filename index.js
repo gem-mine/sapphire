@@ -7,7 +7,7 @@ const regInstallScript = require('./scripts/project/install')
 const regUpdateScript = require('./scripts/project/update')
 const pkg = require('./package.json')
 const context = require('./context')
-const { exec, autoSetRegistry } = require('gem-mine-helper')
+const { exec, autoSetRegistry, log } = require('gem-mine-helper')
 const { listen } = require('./utils/project/report')
 
 // 注册退出的事件监听
@@ -19,6 +19,7 @@ checkGit()
 
 // 自动切换 npm 源
 autoSetRegistry()
+log.info(exec(`npm get registry`))
 
 // 一些环境信息收集
 context.set({
