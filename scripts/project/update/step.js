@@ -64,6 +64,6 @@ module.exports = function() {
         message: e.message,
         exit_code: EXIT_CODE.ERROR
       })
-      console.error(e)
+      report.emit(context)
     })
 }
