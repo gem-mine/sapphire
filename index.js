@@ -19,7 +19,6 @@ checkGit()
 
 // 自动切换 npm 源
 autoSetRegistry()
-log.info(exec(`npm get registry`))
 
 // 一些环境信息收集
 context.set({
