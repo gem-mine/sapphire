@@ -1,6 +1,6 @@
 {
   "name": "gem-mine",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "a fantastic react boilerplate ",
   "keywords": [
     "react",
@@ -22,7 +22,7 @@
     "gem-mine": "index.js"
   },
   "scripts": {
-    "lint": "eslint --ext .js scripts"
+    "lint": "eslint --ext .js ./"
   },
   "dependencies": {
     "chalk": "^2.3.0",
