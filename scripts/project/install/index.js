@@ -25,6 +25,7 @@ module.exports = function (program, pkg) {
         type: TYPE.PROJECT,
         command: COMMAND.INSTALL,
         root,
+        input: name,
         name: projectName
       })
 

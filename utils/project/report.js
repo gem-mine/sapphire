@@ -20,7 +20,7 @@ function printSuccess(context) {
   console.log('\n')
   console.log(chalk.cyan(SAYINGS[Math.floor(Math.random() * SAYINGS.length)]))
   console.log(chalk.magenta(`${WISH}\n`))
-  const { ui, command, name: projectName } = context
+  const { ui, command, input } = context
   let uiDoc = ''
   if (ui) {
     uiDoc = UI_DOC[ui]
@@ -32,7 +32,7 @@ function printSuccess(context) {
   let tip = ''
   if (command === COMMAND.INSTALL) {
     tip = `你已经完成了项目的初始化。快速开始项目只需简单的两步：
-  1. cd ${projectName}
+  1. cd ${input}
   2. npm start
 `
   } else if (command === COMMAND.UPDATE) {
@@ -62,10 +62,10 @@ function printError(context) {
 const report = new EventEmitter()
 
 let shouldRun = true
-exports.listen = function() {
+exports.listen = function () {
   if (shouldRun) {
     shouldRun = false
-    report.on('report', function(context) {
+    report.on('report', function (context) {
       const { exit_code: code } = context
       log.warning(`receive exit event message: ${code}`)
       try {
@@ -92,6 +92,6 @@ exports.listen = function() {
   }
 }
 
-exports.emit = function(context) {
+exports.emit = function (context) {
   report.emit('report', context)
 }

@@ -23,7 +23,7 @@ function cloneTemplate(context) {
   const branch = getTemplateBranch(context)
   execWithSilent(`git checkout master-${branch}`, { cwd: shadowPath })
   if (!fs.existsSync(root)) {
-    fs.mkdirSync(root)
+    fs.ensureDirSync(root)
   }
   const { version: templateVersion } = readJSON(path.resolve(shadowPath, 'package.json'))
   context.set({
@@ -61,7 +61,7 @@ function gitInfo(context) {
 function copyProject(context) {
   const { root, classic_git: classicGit, shadow_path: shadowPath } = context
   const ignores = ['manifest.json', '.git', 'src', 'package-lock.json']
-  fs.readdirSync(shadowPath).forEach(function(name) {
+  fs.readdirSync(shadowPath).forEach(function (name) {
     if (ignores.indexOf(name) === -1) {
       fs.copySync(path.join(shadowPath, name), path.join(root, name))
     }
@@ -101,7 +101,7 @@ function cloneClassic(context) {
 
   execWithSilent(`git checkout ${branch}`, { cwd: shadowPath })
   const dels = ['.gitignore', 'package.json', 'package-lock.json', '.git', 'readme.md', 'README.md']
-  dels.forEach(function(item) {
+  dels.forEach(function (item) {
     const dist = path.join(shadowPath, item)
     if (fs.existsSync(dist)) {
       fs.removeSync(dist)

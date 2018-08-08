@@ -47,7 +47,12 @@ function setPackageJsonName(context) {
   const { root, name: projectName } = context
   const pkgPath = path.join(root, 'package.json')
   const pkg = readJSON(pkgPath)
-  pkg.name = projectName
+  const parent = path.basename(path.dirname(root))
+  if (parent[0] === '@') {
+    pkg.name = `${parent}/${projectName}`
+  } else {
+    pkg.name = projectName
+  }
   writeJSON(pkgPath, pkg)
 }
 
@@ -99,10 +104,10 @@ function updatePackageJson(context) {
     }
   }
 
-  ;(function(items) {
-    items.forEach(function(item) {
+  ;(function (items) {
+    items.forEach(function (item) {
       const { key, update } = item
-      Object.keys(newPkg[key]).forEach(function(v) {
+      Object.keys(newPkg[key]).forEach(function (v) {
         if (pkg[key][v] !== newPkg[key][v]) {
           pkg[key][v] = newPkg[key][v]
           if (update) {
@@ -114,12 +119,12 @@ function updatePackageJson(context) {
       })
     })
   })([{ key: 'dependencies' }, { key: 'devDependencies' }, { key: 'scripts', update: true }])
-  ;(function(items) {
-    items.forEach(function(item) {
+  ;(function (items) {
+    items.forEach(function (item) {
       const arr = pkg[item] || []
       const newArr = newPkg[item]
       if (newArr) {
-        newArr.forEach(function(v) {
+        newArr.forEach(function (v) {
           if (arr.indexOf(v) === -1) {
             arr.push(v)
           }
