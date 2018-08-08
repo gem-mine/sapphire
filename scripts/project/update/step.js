@@ -7,11 +7,11 @@ const { checkTemplateVersion, checkClassicVersion, checkUIVersion } = require('.
 const { EXIT_CODE } = require('../../../constant/core')
 const report = require('../../../utils/project/report')
 
-module.exports = function() {
-  const { ui, classic_git: classicGit, template_version: templateVersion } = context
+module.exports = function () {
+  const { ui, classic_git: classicGit } = context
 
   let options
-  checkTemplateVersion(context, function(localVersion, remoteVersion) {
+  checkTemplateVersion(context, function (localVersion, remoteVersion) {
     if (localVersion) {
       if (localVersion === remoteVersion) {
         options = getOptions(UPDATE_TYPE.NONE)
@@ -25,13 +25,13 @@ module.exports = function() {
   }
 
   if (ui) {
-    checkUIVersion(context, function(localVersion, remoteVersion) {
+    checkUIVersion(context, function (localVersion, remoteVersion) {
       options.push(UIOption(context, localVersion, remoteVersion))
     })
   }
 
   if (classicGit) {
-    checkClassicVersion(context, function(localVersion, remoteVersion) {
+    checkClassicVersion(context, function (localVersion, remoteVersion) {
       options.push(classicOption(context, localVersion, remoteVersion))
     })
   }
@@ -43,10 +43,10 @@ module.exports = function() {
     pageSize: options.length,
     choices: options
   })
-    .then(function(params) {
+    .then(function (params) {
       cloneTemplate(context) // 获取模板
 
-      params.update.forEach(function(key) {
+      params.update.forEach(function (key) {
         // 根据选择执行对应的代码或包更新
         const fn = updateProject[key]
         if (fn) {
@@ -58,7 +58,7 @@ module.exports = function() {
       context.set('exit_code', EXIT_CODE.SUCCESS)
       report.emit(context)
     })
-    .catch(function(e) {
+    .catch(function (e) {
       context.set({
         error: true,
         message: e.message,

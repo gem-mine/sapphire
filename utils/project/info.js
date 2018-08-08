@@ -24,7 +24,7 @@ const KEYS = [
 function saveInfo(context) {
   const { root } = context
   const info = {}
-  KEYS.forEach(function(key) {
+  KEYS.forEach(function (key) {
     info[key] = context[key]
   })
 
@@ -35,6 +35,7 @@ function saveInfo(context) {
 function getPkg(root) {
   const lockPath = path.join(root, 'package-lock.json')
   const pkgPath = path.join(root, 'package.json')
+  let pkg
   if (fs.existsSync(lockPath)) {
     pkg = readJSON(lockPath)
   }
@@ -57,7 +58,7 @@ function getInfoIfMiss(context, pkg) {
     platform = PC
 
     const uiLibs = [FISH, FISH_MOBILE, ANTD, ANTD_MOBILE]
-    uiLibs.some(function(key) {
+    uiLibs.some(function (key) {
       if (getIn(pkg, `dependencies.${key}`)) {
         ui = key
         if (ui !== FISH) {

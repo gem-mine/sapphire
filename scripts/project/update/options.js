@@ -30,39 +30,39 @@ function updateSuccessMsg(msg) {
 
 const OPTIONS = {
   WEBPACK: {
-    name: function(flag = true) {
+    name: function (flag = true) {
       return getMsg(MSG.WEBPACK, flag)
     },
     value: 'webpack_config',
     checked: true
   },
   PROJECT_CONFIG: {
-    name: function(flag = true) {
+    name: function (flag = true) {
       return getMsg(MSG.PROJECT_CONFIG, flag)
     },
     value: 'project_config',
     checked: true
   },
   OTHER_CONFIG: {
-    name: function(flag = false) {
+    name: function (flag = false) {
       return getMsg(MSG.OTHER_CONFIG, flag)
     },
     value: 'other_config'
   },
   PUBLIC: {
-    name: function(flag = false) {
+    name: function (flag = false) {
       return getMsg(MSG.PUBLIC, flag)
     },
     value: 'public'
   },
   SRC: {
-    name: function(flag = false) {
+    name: function (flag = false) {
       return getMsg(MSG.SRC, flag)
     },
     value: 'src'
   },
   UTIL: {
-    name: function(flag = true) {
+    name: function (flag = true) {
       return getMsg(MSG.UTIL, flag)
     },
     value: 'util',
@@ -98,18 +98,18 @@ function copy(shadowPath, root, target) {
 }
 
 exports.updateProject = {
-  [OPTIONS.WEBPACK.value]: function(context) {
+  [OPTIONS.WEBPACK.value]: function (context) {
     const { shadow_path: shadowPath, root } = context
     const arr = ['webpack.config.js', 'config/webpack.js', 'config/webpack']
-    arr.forEach(function(target) {
+    arr.forEach(function (target) {
       copy(shadowPath, root, target)
     })
     updateSuccessMsg(MSG.WEBPACK)
   },
-  [OPTIONS.PROJECT_CONFIG.value]: function(context) {
+  [OPTIONS.PROJECT_CONFIG.value]: function (context) {
     const { ui, shadow_path: shadowPath, root } = context
     const files = fs.readdirSync(shadowPath)
-    files.forEach(function(name) {
+    files.forEach(function (name) {
       const stats = fs.statSync(path.resolve(shadowPath, name))
       if (name.indexOf('.') === 0 && stats.isFile()) {
         copy(shadowPath, root, name)
@@ -120,37 +120,37 @@ exports.updateProject = {
     }
     updateSuccessMsg(MSG.PROJECT_CONFIG)
   },
-  [OPTIONS.OTHER_CONFIG.value]: function(context) {
+  [OPTIONS.OTHER_CONFIG.value]: function (context) {
     const { shadow_path: shadowPath, root } = context
     const files = fs.readdirSync(path.resolve(shadowPath, 'config'))
-    files.forEach(function(name) {
+    files.forEach(function (name) {
       if (name !== 'webpack' && name !== 'webpack.js') {
         copy(shadowPath, root, `config/${name}`)
       }
     })
     updateSuccessMsg(MSG.OTHER_CONFIG)
   },
-  [OPTIONS.PUBLIC.value]: function(context) {
+  [OPTIONS.PUBLIC.value]: function (context) {
     const { shadow_path: shadowPath, root } = context
     copy(shadowPath, root, 'public')
     updateSuccessMsg(MSG.PUBLIC)
   },
-  [OPTIONS.SRC.value]: function(context) {
+  [OPTIONS.SRC.value]: function (context) {
     copySrc(context)
     updateSuccessMsg(MSG.SRC)
   },
-  [OPTIONS.UTIL.value]: function(context) {
+  [OPTIONS.UTIL.value]: function (context) {
     const { shadow_path: shadowPath, root } = context
     copy(shadowPath, root, 'src/global/util')
     updateSuccessMsg(MSG.UTIL)
   },
-  [UI]: function(context) {
+  [UI]: function (context) {
     const { ui, remote_ui_version: remoteVersion } = context
     context.set('ui_version', remoteVersion)
     execWithProcess(`npm i ${ui} --save`)
     updateSuccessMsg(MSG.UI)
   },
-  [CLASSIC]: function(context) {
+  [CLASSIC]: function (context) {
     const { remote_classic_version: remoteVersion } = context
     context.set('classic_version', remoteVersion)
     cloneClassic(context)
@@ -164,17 +164,17 @@ const UPDATE_TYPE = {
 }
 exports.UPDATE_TYPE = UPDATE_TYPE
 
-exports.getOptions = function(type) {
+exports.getOptions = function (type) {
   if (type <= UPDATE_TYPE.NONE) {
     const flag = type === UPDATE_TYPE.ALL
-    return Object.keys(OPTIONS).map(function(key) {
+    return Object.keys(OPTIONS).map(function (key) {
       const options = Object.assign({}, OPTIONS[key])
       options.name = options.name(flag)
       options.checked = flag
       return options
     })
   } else {
-    return Object.keys(OPTIONS).map(function(key) {
+    return Object.keys(OPTIONS).map(function (key) {
       const options = Object.assign({}, OPTIONS[key])
       options.name = options.name()
       return options
