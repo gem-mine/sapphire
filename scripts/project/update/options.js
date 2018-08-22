@@ -1,7 +1,7 @@
 const chalk = require('chalk')
 const fs = require('fs-extra')
 const path = require('path')
-const { execWithProcess, getUIName } = require('gem-mine-helper')
+const { execWithProcess, getUIName, runNpm } = require('gem-mine-helper')
 const { cloneClassic, copySrc } = require('../../../utils/project/git')
 const updateBabelrc = require('../../../utils/project/babelrc')
 
@@ -145,9 +145,9 @@ exports.updateProject = {
     updateSuccessMsg(MSG.UTIL)
   },
   [UI]: function (context) {
-    const { ui, remote_ui_version: remoteVersion } = context
+    const { root, ui, remote_ui_version: remoteVersion } = context
     context.set('ui_version', remoteVersion)
-    execWithProcess(`npm i ${ui} --save`)
+    runNpm(`npm i ${ui} --save`, { cwd: root }, true)
     updateSuccessMsg(MSG.UI)
   },
   [CLASSIC]: function (context) {

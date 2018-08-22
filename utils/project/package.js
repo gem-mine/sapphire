@@ -1,5 +1,5 @@
 const path = require('path')
-const { exec, execWithProcess, readJSON, writeJSON, runNpm } = require('gem-mine-helper')
+const { exec, readJSON, writeJSON, runNpm, log } = require('gem-mine-helper')
 const { ANTD_MOBILE, FISH_MOBILE } = require('../../constant/ui')
 const updateBabelrc = require('./babelrc')
 
@@ -21,9 +21,9 @@ function installDeps(context) {
     reactVersion = exec(`npm show react version`)
   }
   context.set('react_version', reactVersion)
-  execWithProcess(`npm i react@${reactVersion} react-dom@${reactVersion} --save --loglevel=error`, { cwd: root })
+  runNpm(`npm i react@${reactVersion} react-dom@${reactVersion} --save --loglevel=error`, { cwd: root }, true)
   if (!ie8) {
-    execWithProcess(`npm i prop-types create-react-class --save --loglevel=error`, { cwd: root })
+    runNpm(`npm i prop-types create-react-class --save --loglevel=error`, { cwd: root }, true)
   }
 
   if (ui) {
@@ -32,12 +32,12 @@ function installDeps(context) {
     context.set('ui_version', uiVersion)
 
     if (ui === ANTD_MOBILE || ui === FISH_MOBILE) {
-      execWithProcess(`npm i rc-form --save`, { cwd: root })
+      runNpm(`npm i rc-form --save`, { cwd: root }, true)
     }
 
     updateBabelrc(context)
   }
-  execWithProcess(`npm i --loglevel=error`, { cwd: root })
+  runNpm(`npm i --loglevel=error`, { cwd: root }, true)
 }
 
 /**
@@ -66,7 +66,8 @@ function checkAndUpdatePkg(root, name, pkg) {
     now = pkg[name].replace(/^\D+/, '')
   }
   if (latest !== now) {
-    execWithProcess(`npm i ${name}@latest --save --loglevel=error`, { cwd: root })
+    log.info(`正在更新包 ${name}: ${now} → ${latest}`)
+    runNpm(`npm i ${name}@latest --save --loglevel=error`, { cwd: root }, true)
     return latest
   }
 }
@@ -77,11 +78,10 @@ function checkAndUpdatePkg(root, name, pkg) {
  */
 function updatePackageJson(context) {
   const { root, shadow_path: shadowPath, ie8, ui } = context
-  console.log('\n正在检查更新项目依赖包（package.json 中声明的依赖）...\n')
+  log.info('\n正在检查更新项目依赖包（package.json 中声明的依赖）...\n')
   const pkgPath = path.join(root, 'package.json')
   const pkg = readJSON(pkgPath)
   const newPkg = readJSON(path.join(shadowPath, 'package.json'))
-  let shouldInstall = false
   let shouldUpdate = false
 
   // 非 IE8 项目保持 react、react-dom、prop-types、create-react-class 最新版本
@@ -108,12 +108,15 @@ function updatePackageJson(context) {
     items.forEach(function (item) {
       const { key, update } = item
       Object.keys(newPkg[key]).forEach(function (v) {
-        if (pkg[key][v] !== newPkg[key][v]) {
-          pkg[key][v] = newPkg[key][v]
+        const version = newPkg[key][v]
+        const oldVersion = pkg[key][v]
+        if (oldVersion !== version) {
+          pkg[key][v] = version
           if (update) {
             shouldUpdate = true
           } else {
-            shouldInstall = true
+            log.info(`正在更新包 ${v}: ${oldVersion} → ${version}`)
+            runNpm(`npm i ${v}@${version}`, { cwd: root }, true)
           }
         }
       })
@@ -137,14 +140,11 @@ function updatePackageJson(context) {
     })
   })(['pre-commit'])
 
-  if (shouldInstall || shouldUpdate) {
+  if (shouldUpdate) {
     writeJSON(pkgPath, pkg)
-    if (shouldInstall) {
-      execWithProcess(`npm i --loglevel=error`, { cwd: root })
-    }
-    console.log('更新项目依赖包成功\n')
+    log.info('更新项目依赖包成功\n')
   } else {
-    console.log('项目中的依赖已经和 gem-mine-template 中一致，无须更新')
+    log.info('项目中的依赖已经和 gem-mine-template 中一致，无须更新')
   }
 }
 
