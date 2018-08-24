@@ -98,8 +98,8 @@ module.exports = function () {
     .then(function () {
       cloneTemplate(context) // 获取模板
       copyProject(context) // 拷贝需要的代码
-      installDeps(context) // 安装依赖
       setPackageJsonName(context) // 更新 package.json 的 name
+      installDeps(context) // 安装依赖
       context.set('exit_code', EXIT_CODE.SUCCESS)
       report.emit(context)
     })
