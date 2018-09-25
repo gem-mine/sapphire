@@ -6,7 +6,7 @@ const {
   execWithSilent,
   readJSON,
   getUIName,
-  getTemplateBranch,
+  getNativeBranch,
   getGitRepo,
   getGitInfo
 } = require('gem-mine-helper')
@@ -15,20 +15,18 @@ const { REPO } = require('../../constant/core')
 /**
  * 获取 gem-mine-template 对应分支代码模板
  */
-function cloneTemplate(context) {
+function cloneNative(context) {
   const { root } = context
   const shadowPath = getShadowPath('gem-mine-')
 
   execWithProcess(`git clone ${REPO} ${shadowPath} --depth=1 --no-single-branch`)
-  const branch = getTemplateBranch(context)
+  const branch = getNativeBranch(context)
   execWithSilent(`git checkout master-${branch}`, { cwd: shadowPath })
   if (!fs.existsSync(root)) {
     fs.ensureDirSync(root)
   }
-  const { version: templateVersion } = readJSON(path.resolve(shadowPath, 'package.json'))
   context.set({
-    shadow_path: shadowPath,
-    template_version: templateVersion
+    shadow_path: shadowPath
   })
 }
 
@@ -56,11 +54,14 @@ function gitInfo(context) {
 }
 
 /**
- * 拷贝工程以及指定内容到要创建的工程
+ * 拷贝脚手架
  */
-function copyProject(context) {
-  const { root, classic_git: classicGit, shadow_path: shadowPath } = context
+function copyNative(context, update = false) {
+  const { root, shadow_path: shadowPath } = context
   const ignores = ['manifest.json', '.git', 'src', 'package-lock.json']
+  if (update) {
+    ignores.push('package.json')
+  }
   fs.readdirSync(shadowPath).forEach(function (name) {
     if (ignores.indexOf(name) === -1) {
       fs.copySync(path.join(shadowPath, name), path.join(root, name))
@@ -68,14 +69,12 @@ function copyProject(context) {
   })
 
   copySrc(context)
-
-  if (classicGit) {
-    cloneClassic(context)
-  }
+  const { version: nativeVersion } = readJSON(path.resolve(shadowPath, 'package.json'))
+  context.set('native_version', nativeVersion)
 }
 
 /**
- * 拷贝 src 目录（会处理 UI example）
+ * 拷贝脚手架 src 目录（会处理 UI example）
  */
 function copySrc(context) {
   const { root, ui, shadow_path: shadowPath } = context
@@ -92,23 +91,41 @@ function copySrc(context) {
  * 获取 classic 对应分支代码模板
  */
 function cloneClassic(context) {
-  const { root, classic_git: classicGit, classic_branch: branch } = context
+  const { classic_git: classicGit, classic_branch: branch } = context
   const shadowPath = getShadowPath('classic-')
+  context.set('shadow_path', shadowPath)
   execWithProcess(`git clone ${classicGit} ${shadowPath} --depth=1 --no-single-branch`)
   execWithSilent(`git checkout ${branch}`, { cwd: shadowPath })
-  const { version } = readJSON(path.resolve(shadowPath, 'package.json'))
-  context.set('classic_version', version)
+}
 
-  execWithSilent(`git checkout ${branch}`, { cwd: shadowPath })
-  const dels = ['.gitignore', 'package.json', 'package-lock.json', '.git', 'readme.md', 'README.md']
-  dels.forEach(function (item) {
-    const dist = path.join(shadowPath, item)
-    if (fs.existsSync(dist)) {
-      fs.removeSync(dist)
+/**
+ * 拷贝经典代码骨架
+ */
+function copyClassic(context, update = false) {
+  const { root, shadow_path: shadowPath, name } = context
+  const { version } = readJSON(path.resolve(shadowPath, 'package.json'))
+  let config
+  try {
+    config = readJSON(path.resolve(shadowPath, '.gem-mine'))
+  } catch (e) {
+    throw new Error(`这不是一个 gem-mine 可管理的脚手架`)
+  }
+
+  context.set({
+    from_id: config.id,
+    name,
+    classic_version: version
+  })
+
+  const ignores = ['manifest.json', '.git', 'package-lock.json', '.gem-mine']
+  if (update) {
+    ignores.push('package.json')
+  }
+  fs.readdirSync(shadowPath).forEach(function (name) {
+    if (ignores.indexOf(name) === -1) {
+      fs.copySync(path.join(shadowPath, name), path.join(root, name))
     }
   })
-  fs.copySync(shadowPath, root)
-  fs.removeSync(shadowPath)
 }
 
 /**
@@ -122,8 +139,11 @@ function getShadowPath(prefix) {
   return shadowPath
 }
 
-exports.cloneTemplate = cloneTemplate
-exports.copyProject = copyProject
-exports.gitInfo = gitInfo
-exports.cloneClassic = cloneClassic
+exports.cloneNative = cloneNative
+exports.copyNative = copyNative
 exports.copySrc = copySrc
+
+exports.gitInfo = gitInfo
+
+exports.cloneClassic = cloneClassic
+exports.copyClassic = copyClassic

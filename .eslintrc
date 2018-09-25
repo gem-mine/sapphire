@@ -3,13 +3,12 @@
   "parserOptions": {
     "ecmaVersion": 8,
     "ecmaFeatures": {
-      "experimentalObjectRestSpread": true,
-      "jsx": true
+      "experimentalObjectRestSpread": true
     },
     "sourceType": "module"
   },
-  "plugins": ["react"],
-  "extends": ["standard", "standard-react"],
+  "plugins": [],
+  "extends": ["standard"],
   "env": {
     "browser": true,
     "amd": true,

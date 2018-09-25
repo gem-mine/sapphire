@@ -3,8 +3,8 @@ const {
   printBox,
   log,
   checkCliVersion: _checkCliVersion,
-  checkTemplateVersion: _checkTemplateVersion,
   checkUIVersion: _checkUIVersion,
+  checkNativeVersion: _checkNativeVersion,
   checkClassicVersion: _checkClassicVersion
 } = require('gem-mine-helper')
 const { GEM_MINE_DOC_VERSION } = require('../../constant/core')
@@ -28,34 +28,34 @@ function checkCliVersion() {
   })
 }
 
-function checkTemplateVersion(context, callback) {
-  console.log('\n正在获取工程代码骨架版本...')
+function checkNativeVersion(context, callback) {
+  log.info(`正在获取脚手架最新版本号...`)
 
-  _checkTemplateVersion(context, function ({ localVersion, remoteVersion }) {
+  _checkNativeVersion(context, function ({ localVersion, remoteVersion }) {
     if (remoteVersion) {
       context.set({
-        local_template_version: localVersion,
-        remote_template_version: remoteVersion,
-        template_version: remoteVersion
+        local_native_version: localVersion,
+        remote_native_version: remoteVersion,
+        native_version: remoteVersion
       })
       const versionFlag = localVersion !== remoteVersion
       if (versionFlag) {
-        const msg = localVersion ? `本地代码骨架版本为 ${chalk.red(localVersion)}` : '本地未获取到工程代码骨架版本'
-        console.log(`${msg}，当前最新代码工程代码骨架版本为 ${chalk.yellow(remoteVersion)}`)
+        const msg = localVersion ? `本地脚手架版本为 ${chalk.red(localVersion)}` : '本地未获取到脚手架版本'
+        console.log(`${msg}，当前最新脚手架版本为 ${chalk.yellow(remoteVersion)}`)
         console.log(`版本履历可以通过此链接查看：${chalk.green(`${GEM_MINE_DOC_VERSION}`)}\n`)
       } else {
-        console.log(`工程代码骨架已经是最新版本：${chalk.yellow(localVersion)}\n`)
+        console.log(`脚手架已经是最新版本：${chalk.yellow(localVersion)}\n`)
       }
       callback(localVersion, remoteVersion)
     } else {
-      log.error(`网络异常，未能获取到工程代码骨架`)
+      log.error(`网络异常，未能获取到脚手架版本`)
     }
   })
 }
 
 function checkUIVersion(context, callback) {
   const { ui } = context
-  console.log(`正在获取 ${ui} 最新版本号...`)
+  console.log(`\n正在获取 ${ui} 最新版本号...`)
   _checkUIVersion(context, function ({ localVersion, remoteVersion }) {
     if (remoteVersion) {
       context.set({
@@ -81,6 +81,7 @@ function checkUIVersion(context, callback) {
 }
 
 function checkClassicVersion(context, callback) {
+  console.log('\n正在获取经典代码骨架版本...')
   _checkClassicVersion(context, function ({ localVersion, remoteVersion, git, branch }) {
     context.set({
       local_classic_version: localVersion,
@@ -103,7 +104,7 @@ function checkClassicVersion(context, callback) {
 
 module.exports = {
   checkCliVersion,
-  checkTemplateVersion,
+  checkNativeVersion,
   checkUIVersion,
   checkClassicVersion
 }

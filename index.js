@@ -5,13 +5,10 @@ const os = require('os')
 const { checkGit, checkNodeVersion } = require('./utils/env')
 const regInstallScript = require('./scripts/project/install')
 const regUpdateScript = require('./scripts/project/update')
-const pkg = require('./package.json')
+const regPublishScript = require('./scripts/project/publish')
+const pkg = require('./package.json') // gem-mine 的 package.json
 const context = require('./context')
 const { exec, autoSetRegistry } = require('gem-mine-helper')
-const { listen } = require('./utils/project/report')
-
-// 注册退出的事件监听
-listen()
 
 // 检查环境再开始执行
 checkNodeVersion()
@@ -33,7 +30,11 @@ program.version(pkg.version)
 
 // 项目初始化脚本
 regInstallScript(program, pkg)
+
 // 项目升级脚本
 regUpdateScript(program, pkg)
+
+// 项目发布脚本
+regPublishScript(program, pkg)
 
 program.parse(process.argv)

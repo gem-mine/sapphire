@@ -1,4 +1,5 @@
-const { FISH, ANTD } = require('../../constant/ui')
+const { genIndex } = require('../../../../utils/choice')
+const { FISH, ANTD } = require('../../../../constant/ui')
 
 module.exports = function (ie8) {
   const choices = [
@@ -21,6 +22,6 @@ module.exports = function (ie8) {
     type: 'list',
     name: 'ui',
     message: '选择 UI 组件库:',
-    choices
+    choices: genIndex(choices)
   }
 }

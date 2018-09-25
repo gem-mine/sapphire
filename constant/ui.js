@@ -2,15 +2,15 @@
  * UI 相关常量
  */
 const { CONSTANT } = require('gem-mine-helper')
-const { SDP_PREFIX } = CONSTANT
+const { SXP, SXP_PREFIX } = CONSTANT
 
-const FISH = `${SDP_PREFIX}/fish`
-const FISH_MOBILE = `${SDP_PREFIX}/fish-mobile`
+const FISH = `${SXP_PREFIX}/fish`
+const FISH_MOBILE = `${SXP_PREFIX}/fish-mobile`
 const ANTD = 'antd'
 const ANTD_MOBILE = 'antd-mobile'
 
-const FISH_DOC = 'http://fish-docs.sdp.101.com'
-const FISH_MOBILE_DOC = 'http://fish-design-mobile.sdp.101.com'
+const FISH_DOC = `http://fish-docs.${SXP}.101.com`
+const FISH_MOBILE_DOC = `http://fish-design-mobile.${SXP}.101.com`
 const ANTD_DOC = 'https://ant.design'
 const ANTD_MOBILE_DOC = 'https://mobile.ant.design'
 
