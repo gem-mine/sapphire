@@ -3,7 +3,7 @@
  */
 const { CONSTANT } = require('gem-mine-helper')
 
-const GEM_MINE_DOC = 'https://gem-mine.gitee.io/gem-mine-docs'
+const GEM_MINE_DOC = 'https://gem-mine.club'
 const GEM_MINE_DOC_VERSION = `${GEM_MINE_DOC}/#/docs/version`
 
 const REPO = 'https://gitee.com/gem-mine/gem-mine-template.git'
