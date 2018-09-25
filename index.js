@@ -8,14 +8,11 @@ const regUpdateScript = require('./scripts/project/update')
 const regPublishScript = require('./scripts/project/publish')
 const pkg = require('./package.json') // gem-mine 的 package.json
 const context = require('./context')
-const { exec, autoSetRegistry } = require('gem-mine-helper')
+const { exec } = require('gem-mine-helper')
 
 // 检查环境再开始执行
 checkNodeVersion()
 checkGit()
-
-// 自动切换 npm 源
-autoSetRegistry()
 
 // 一些环境信息收集
 context.set({
