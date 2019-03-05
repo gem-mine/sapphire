@@ -5,10 +5,9 @@ const os = require('os')
 const { checkGit, checkNodeVersion } = require('./utils/env')
 const regInstallScript = require('./scripts/project/install')
 const regUpdateScript = require('./scripts/project/update')
-const regPublishScript = require('./scripts/project/publish')
-const pkg = require('./package.json') // gem-mine 的 package.json
+const pkg = require('./package.json') // sapphire 的 package.json
 const context = require('./context')
-const { exec } = require('gem-mine-helper')
+const { exec } = require('@gem-mine/sapphire-helper')
 
 // 检查环境再开始执行
 checkNodeVersion()
@@ -30,8 +29,5 @@ regInstallScript(program, pkg)
 
 // 项目升级脚本
 regUpdateScript(program, pkg)
-
-// 项目发布脚本
-regPublishScript(program, pkg)
 
 program.parse(process.argv)

@@ -1,5 +1,5 @@
 const context = require('../../../context')
-const { getGMInitConfig } = require('../../../utils/project/gm-info')
+const { getProjectInitConfig } = require('../../../utils/project/info')
 const { genId } = require('../../../utils/project')
 const { COMMAND } = require('../../../constant/core')
 
@@ -18,7 +18,7 @@ module.exports = function (program) {
       if (!context.get('id')) {
         context.set('id', genId())
       }
-      context.set(getGMInitConfig(context))
-      await step()
+      context.set(getProjectInitConfig(context))
+      await step(context)
     })
 }

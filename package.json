@@ -1,6 +1,6 @@
 {
-  "name": "gem-mine",
-  "version": "0.4.0",
+  "name": "@gem-mine/sapphire",
+  "version": "1.0.0",
   "description": "a fantastic react boilerplate ",
   "keywords": [
     "react",
@@ -8,10 +8,9 @@
     "boilerplate",
     "fish",
     "ant design",
-    "IE8",
-    "mirror",
     "model",
-    "mobile"
+    "mobile",
+    "cli"
   ],
   "author": {
     "email": "caolvchong@gmail.com",
@@ -19,13 +18,16 @@
   },
   "main": "index.js",
   "bin": {
-    "gem-mine": "index.js"
+    "sapphire": "index.js",
+    "lanbs": "index.js",
+    "blue": "index.js"
   },
   "scripts": {
     "test": "mocha",
     "lint": "eslint --ext .js ./"
   },
   "dependencies": {
+    "@gem-mine/sapphire-helper": "^1.0.1",
     "axios": "^0.18.0",
     "chalk": "^2.3.0",
     "cli-box": "^6.0.8",
@@ -33,7 +35,6 @@
     "commander": "^2.11.0",
     "figlet": "^1.2.0",
     "fs-extra": "^5.0.0",
-    "gem-mine-helper": "^0.3.1",
     "inquirer": "^6.0.0",
     "mkdirp": "^0.5.1",
     "update-notifier": "^2.5.0",

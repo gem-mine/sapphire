@@ -1,7 +1,7 @@
 /**
  * UI 相关常量
  */
-const { CONSTANT } = require('gem-mine-helper')
+const { CONSTANT } = require('@gem-mine/sapphire-helper')
 const { SXP, SXP_PREFIX } = CONSTANT
 
 const FISH = `${SXP_PREFIX}/fish`

@@ -1,5 +1,5 @@
 const { prompt } = require('inquirer')
-const { log, runNpm } = require('gem-mine-helper')
+const { log, runNpm } = require('@gem-mine/sapphire-helper')
 const { checkUIVersion } = require('../../../utils/project/version')
 
 const CHOICES = [
@@ -48,7 +48,7 @@ module.exports = function (context) {
       if (choice) {
         const { root, ui, remote_ui_version: remoteVersion } = context
         context.set('ui_version', remoteVersion)
-        runNpm(`npm i ${ui} --save`, { cwd: root }, true)
+        runNpm(`npm i ${ui} --save --loglevel=error`, { cwd: root }, true)
         log.info(`更新 UI库 ${ui} 成功`)
       }
     })

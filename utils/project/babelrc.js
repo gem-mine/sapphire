@@ -1,5 +1,5 @@
 const path = require('path')
-const { readJSON, writeJSON, getUIName } = require('gem-mine-helper')
+const { readJSON, writeJSON, getUIName } = require('@gem-mine/sapphire-helper')
 
 /**
  * 更新 .babelrc，目的是为了处理 UI 库的按需打包

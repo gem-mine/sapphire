@@ -1,7 +1,7 @@
 const path = require('path')
 const fs = require('fs-extra')
 const chalk = require('chalk')
-const { log } = require('gem-mine-helper')
+const { log } = require('@gem-mine/sapphire-helper')
 const { prompt } = require('inquirer')
 const choice = require('../../../utils/choice')
 const context = require('../../../context')

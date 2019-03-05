@@ -1,5 +1,5 @@
 const chalk = require('chalk')
-const { exec, commandExists } = require('gem-mine-helper')
+const { exec, commandExists } = require('@gem-mine/sapphire-helper')
 const { NODE_VERSION, EXIT_CODE } = require('../constant/core')
 
 /**
@@ -10,7 +10,7 @@ function checkNodeVersion() {
   const nodeVersion = s.node.split('.')[0]
   if (nodeVersion < NODE_VERSION) {
     console.error(
-      `当前运行的 node 版本 ${chalk.cyan(s.node)} 版本太低，gem-mine 要求 node 版本 >= ${chalk.red(NODE_VERSION)}`
+      `当前运行的 node 版本 ${chalk.cyan(s.node)} 版本太低，sapphire 要求 node 版本 >= ${chalk.red(NODE_VERSION)}`
     )
     process.exit(EXIT_CODE.ENV_INVALID)
   }

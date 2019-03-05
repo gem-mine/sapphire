@@ -1,23 +1,21 @@
 const { genIndex } = require('../../../../utils/choice')
 const { FISH, ANTD } = require('../../../../constant/ui')
 
-module.exports = function (ie8) {
+module.exports = function () {
   const choices = [
     {
       name: 'fish（需要在内网）',
       value: FISH
-    }
-  ]
-  if (!ie8) {
-    choices.push({
+    },
+    {
       name: 'ant design',
       value: ANTD
-    })
-  }
-  choices.push({
-    name: '无',
-    value: ''
-  })
+    },
+    {
+      name: '无',
+      value: ''
+    }
+  ]
   return {
     type: 'list',
     name: 'ui',
