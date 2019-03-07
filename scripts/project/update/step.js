@@ -8,7 +8,7 @@ const { updateProjectPackages, getPackageJson, getPackageVersion, updatePackage 
 const { ANTD_MOBILE, FISH_MOBILE } = require('../../../constant/ui')
 const { diffVersion } = require('./helper')
 const report = require('../../../utils/project/report')
-const forsakeIE8 = require('./forsake-ie8')
+const fix = require('./fix')
 
 async function _checkAndUpdateUI(context, pkg) {
   const { ui } = context
@@ -31,7 +31,7 @@ async function _checkAndUpdateUI(context, pkg) {
 
 module.exports = async function (context) {
   try {
-    const { root, ui, ie8, fromGemMine } = context
+    const { root, ui, ie8 } = context
 
     const pkg = getPackageJson(root, true)
     const { localVersion, remoteVersion } = await checkTemplateVersion(context)
@@ -48,10 +48,8 @@ module.exports = async function (context) {
         })
       )
       if (goon) {
-        // 从 IE8 升级的项目需要进行清理
-        if (fromGemMine && ie8) {
-          forsakeIE8(context)
-        }
+        // 清理修复工作
+        fix(context)
 
         // 进行模板更新
         cloneTemplate(context) // 获取模板
@@ -74,7 +72,6 @@ module.exports = async function (context) {
 
         // 更新 package 依赖
         updateProjectPackages(context)
-        runNpm(`npm i --loglevel=error`)
 
         report.success(context)
       }

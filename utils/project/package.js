@@ -123,40 +123,50 @@ function updatePackage({ root, pkg, name, latest }) {
 
 /**
  * 检测 项目中的依赖 是否和 模板中的依赖 版本一致，非一致情况会更新到 模板中对应的版本
- * 会对 react、react-dom、prop-types、create-react-class 更新到最新版本
  */
 function updateProjectPackages(context) {
   const { root, shadow_path: shadowPath } = context
   log.info('正在检查更新项目依赖包（package.json 中声明的依赖）...')
   const pkgPath = path.join(root, 'package.json')
   const nodeModules = path.join(root, 'node_modules')
-  const pkg = readJSON(pkgPath)
+  const oldPkg = readJSON(pkgPath)
   const newPkg = readJSON(path.join(shadowPath, 'package.json'))
   let shouldUpdate = false
   ;(function (items) {
     items.forEach(function (item) {
       const { key } = item
-      Object.keys(newPkg[key]).forEach(function (v) {
-        const version = newPkg[key][v]
-        const oldVersion = pkg[key][v]
-        if (oldVersion !== version) {
-          pkg[key][v] = version
+      const isPackage = key === 'dependencies' || key === 'devDependencies'
+      Object.keys(newPkg[key]).forEach(function (name) {
+        const newVersion = newPkg[key][name]
+        const oldVersion = oldPkg[key][name]
+        if (oldVersion !== newVersion) {
+          oldPkg[key][name] = newVersion
           shouldUpdate = true
-          if (key === 'dependencies' || key === 'devDependencies') {
+          if (isPackage) {
             if (oldVersion) {
-              log.info(`正在更新包 ${v}: ${oldVersion} → ${version}`)
+              log.info(`正在更新包 ${name}: ${oldVersion} → ${newVersion}`)
             } else {
-              log.info(`正在安装包 ${v}@${version}`)
+              log.info(`正在安装包 ${name}@${newVersion}`)
             }
-            runNpm(`npm i ${v}@${version} --loglevel=error`, { cwd: root }, true)
+            runNpm(`npm i ${name}@${newVersion} --loglevel=error`, { cwd: root }, true)
           }
         }
       })
+      if (isPackage) {
+        // 原 package.json 中的包如果不存在了，应该重新安装
+        Object.keys(oldPkg[key]).forEach(function (name) {
+          if (!fs.existsSync(`${nodeModules}/${name}`)) {
+            const version = oldPkg[key][name]
+            log.info(`正在安装包 ${name}@${version}`)
+            runNpm(`npm i ${name}@${version} --loglevel=error`, { cwd: root }, true)
+          }
+        })
+      }
     })
   })([{ key: 'dependencies' }, { key: 'devDependencies' }, { key: 'scripts' }])
   ;(function (items) {
     items.forEach(function (item) {
-      const arr = pkg[item] || []
+      const arr = oldPkg[item] || []
       const newArr = newPkg[item]
       if (newArr) {
         newArr.forEach(function (v) {
@@ -165,15 +175,15 @@ function updateProjectPackages(context) {
           }
         })
       }
-      if (arr !== pkg[item]) {
-        pkg[item] = arr
+      if (arr !== oldPkg[item]) {
+        oldPkg[item] = arr
         shouldUpdate = true
       }
     })
   })(['pre-commit'])
 
   if (shouldUpdate) {
-    writeJSON(pkgPath, pkg)
+    writeJSON(pkgPath, oldPkg)
     log.info('更新项目依赖包成功\n')
   } else {
     log.info('项目中的依赖已经和最新模板中一致，无须更新')

@@ -1,6 +1,7 @@
 const fs = require('fs-extra')
 const { log, readJSON, writeJSON } = require('@gem-mine/sapphire-helper')
 
+// 对包的清理，针对 gem-mine 项目
 function _fixPackage(root) {
   const pkgPath = `${root}/package.json`
   const pkg = readJSON(pkgPath)
@@ -40,7 +41,7 @@ function _fixPackage(root) {
   }
 }
 
-// 处理 package.json 中的 browserslist
+// 处理 package.json 中的 browserslist，仅针对 IE8 项目
 function _fixBrowserslist(root) {
   const pkgPath = `${root}/package.json`
   const pkg = readJSON(pkgPath)
@@ -59,7 +60,7 @@ function _fixBrowserslist(root) {
   }
 }
 
-// 处理 .bablerc 中的 dynamic-import-webpack
+// 处理 .bablerc 中的 dynamic-import-webpack，针对 gem-mine 项目
 function _fixBabelrc(root) {
   const babelrcPath = `${root}/.babelrc`
   if (fs.existsSync(babelrcPath)) {
@@ -76,8 +77,10 @@ function _fixBabelrc(root) {
 }
 
 module.exports = function (context) {
-  const { root } = context
-  _fixPackage(root)
-  _fixBrowserslist(root)
-  _fixBabelrc(root)
+  const { root, fromGemMine } = context
+  if (fromGemMine) {
+    _fixPackage(root)
+    _fixBrowserslist(root)
+    _fixBabelrc(root)
+  }
 }
