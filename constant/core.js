@@ -6,7 +6,8 @@ const { CONSTANT } = require('@gem-mine/sapphire-helper')
 const SAPPHIRE_DOC = 'https://gem-mine.club'
 const SAPPHIRE_DOC_VERSION = `${SAPPHIRE_DOC}/#/docs/version`
 
-const REPO = 'https://github.com/gem-mine/sapphire-template.git'
+// const REPO = 'https://github.com/gem-mine/sapphire-template.git'
+const REPO = '/Users/tomhome/@gem-mine/sapphire-template'
 const EMAIL = 'caolvchong@gmail.com'
 
 const COMMAND = {

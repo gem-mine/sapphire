@@ -1,4 +1,5 @@
 const fs = require('fs-extra')
+const chalk = require('chalk')
 const path = require('path')
 const { readJSON, writeJSON, runNpm, log } = require('@gem-mine/sapphire-helper')
 const { ANTD_MOBILE, FISH_MOBILE } = require('../../constant/ui')
@@ -34,7 +35,6 @@ function getPackageJson(root, useLockFile) {
  */
 function installDeps(context) {
   const { root, ui } = context
-  runNpm(`npm i react react-dom prop-types create-react-class --save --loglevel=error`, { cwd: root }, true)
 
   if (ui) {
     const uiVersion = runNpm(`npm show ${ui} version`)
@@ -112,7 +112,7 @@ function updatePackage({ root, pkg, name, latest }) {
   const now = getPackageVersion(pkg, name)
   if (now) {
     if (latest !== now) {
-      log.info(`正在更新包 ${name}: ${now} → ${latest}`)
+      log.info(`正在更新包 ${chalk.green(name)}: ${chalk.gray(now)} → ${chalk.yellow(latest)}`)
       runNpm(`npm i ${name}@latest --save --loglevel=error`, { cwd: root }, true)
     }
   } else {

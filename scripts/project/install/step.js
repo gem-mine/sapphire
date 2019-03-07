@@ -7,7 +7,8 @@ const report = require('../../../utils/project/report')
 const choice = {
   platform: require('./choice/platform'),
   pcUI: require('./choice/pc-ui'),
-  mobileUI: require('./choice/mobile-ui')
+  mobileUI: require('./choice/mobile-ui'),
+  goon: require('./choice/goon')
 }
 
 module.exports = async function () {
@@ -26,12 +27,16 @@ module.exports = async function () {
       }
     }
 
-    cloneTemplate(context) // 获取模板
-    copyTemplate(context) // 拷贝脚手架
-    initPackageJson(context) // 初始化 package.json 的 一些字段
-    installDeps(context) // 安装依赖
+    const { goon } = await prompt(choice.goon())
 
-    report.success(context)
+    if (goon) {
+      cloneTemplate(context) // 获取模板
+      copyTemplate(context) // 拷贝脚手架
+      initPackageJson(context) // 初始化 package.json 的 一些字段
+      installDeps(context) // 安装依赖
+
+      report.success(context)
+    }
   } catch (e) {
     report.catchError(context, e)
   }
