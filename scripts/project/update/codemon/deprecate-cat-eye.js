@@ -4,6 +4,13 @@ const fs = require('fs-extra')
 const { log } = require('@gem-mine/sapphire-helper')
 
 module.exports = function (root) {
+  const path = `${root}/src/global`
+  const src = `${path}/cat-eye.js`
+  const dist = `${path}/durex.js`
+  if (fs.existsSync(src)) {
+    fs.moveSync(src, dist, { overwrite: true })
+  }
+
   log.info('将依赖 cat-eye 转换为 @gem-mine/durex，请求库为 @gem-mine/request')
   rd.eachFilterSync(`${root}/src`, /\.jsx?$/, function (file) {
     transform(file)

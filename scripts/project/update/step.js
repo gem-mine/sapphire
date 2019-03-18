@@ -1,6 +1,6 @@
 const { prompt } = require('inquirer')
 const chalk = require('chalk')
-const { runNpm, checkTemplateVersion } = require('@gem-mine/sapphire-helper')
+const { runNpm, checkTemplateVersion, exec } = require('@gem-mine/sapphire-helper')
 const choice = require('../../../utils/choice')
 const updateBabelrc = require('../../../utils/project/babelrc')
 const { cloneTemplate, copyTemplate } = require('../../../utils/project/git')
@@ -72,6 +72,11 @@ module.exports = async function (context) {
 
         // 更新 package 依赖
         updateProjectPackages(context)
+
+        // 自动格式化，处理 jscodeshift 插入的句尾分号问题
+        exec(`npm run lint --fix`, {
+          cwd: root
+        })
 
         report.success(context)
       }

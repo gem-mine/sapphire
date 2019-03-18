@@ -6,7 +6,7 @@ const deprecateCatEye = require('./codemon/deprecate-cat-eye')
 function _fixPackage(root) {
   const pkgPath = `${root}/package.json`
   const pkg = readJSON(pkgPath)
-  const { devDependencies } = pkg
+  const { dependencies, devDependencies } = pkg
 
   fs.removeSync(`${root}/package-lock.json`)
   log.info('已删除 package-lock.json')
@@ -15,22 +15,33 @@ function _fixPackage(root) {
   log.info('正在删除 node_modules，可能需要花费较多时间，请耐心等待')
   fs.removeSync(`${root}/node_modules`)
   log.info('删除 node_modules 成功')
-  const names = [
-    'babel-core',
-    'babel-plugin-syntax-dynamic-import',
-    'babel-plugin-transform-object-assign',
-    'babel-plugin-transform-runtime',
-    'babel-polyfill',
-    'babel-preset-es2015',
-    'babel-preset-react',
-    'babel-preset-stage-0',
-    'es3ify-loader',
-    'extract-text-webpack-plugin',
-    'export-from-ie8',
-    'gem-mine-helper',
-    'json-loader'
-  ]
+  if (dependencies) {
+    const names = ['cat-eye']
+    names.forEach(name => {
+      if (dependencies[name]) {
+        delete dependencies[name]
+        log.info(`删除依赖包 ${name} 成功`)
+      }
+    })
+    pkg.dependencies = dependencies
+  }
+
   if (devDependencies) {
+    const names = [
+      'babel-core',
+      'babel-plugin-syntax-dynamic-import',
+      'babel-plugin-transform-object-assign',
+      'babel-plugin-transform-runtime',
+      'babel-polyfill',
+      'babel-preset-es2015',
+      'babel-preset-react',
+      'babel-preset-stage-0',
+      'es3ify-loader',
+      'extract-text-webpack-plugin',
+      'export-from-ie8',
+      'gem-mine-helper',
+      'json-loader'
+    ]
     names.forEach(name => {
       if (devDependencies[name]) {
         delete devDependencies[name]
@@ -38,8 +49,8 @@ function _fixPackage(root) {
       }
     })
     pkg.devDependencies = devDependencies
-    writeJSON(pkgPath, pkg)
   }
+  writeJSON(pkgPath, pkg)
 }
 
 // 处理 package.json 中的 browserslist，仅针对 IE8 项目
