@@ -38,7 +38,7 @@ function installDeps(context) {
 
   if (ui) {
     const uiVersion = runNpm(`npm show ${ui} version`)
-    runNpm(`npm i ${ui} --save --loglevel=error`, { cwd: root })
+    runNpm(`npm i ${ui} --save --loglevel=error`, { cwd: root }, true)
     context.set('ui_version', uiVersion)
 
     if (ui === ANTD_MOBILE || ui === FISH_MOBILE) {
