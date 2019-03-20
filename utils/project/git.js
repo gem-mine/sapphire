@@ -50,9 +50,28 @@ function gitInfo(context) {
  */
 function copyTemplate(context, update = false) {
   const { root, shadow_path: shadowPath } = context
+  //  根目录下忽略的文件，不进行 copy
   const ignores = ['manifest.json', '.git', 'src', 'package-lock.json']
   if (update) {
     ignores.push('package.json')
+    // 更新模式下要被删除的文件，因为这些文件很可能被用户进行了修改
+    const excludes = [
+      'public/favicon.ico',
+      'config/webpack.js',
+      'config/constant.js',
+      'config/proxy.js',
+      'src/App.jsx',
+      'src/components/home/index.jsx',
+      'src/components/common',
+      'src/components/home',
+      'src/global/routes/index.js',
+      'src/global/model',
+      'src/global/request.js',
+      'src/styles/app.scss'
+    ]
+    excludes.forEach(item => {
+      fs.removeSync(path.join(shadowPath, item))
+    })
   }
   fs.readdirSync(shadowPath).forEach(function (name) {
     if (ignores.indexOf(name) === -1) {
