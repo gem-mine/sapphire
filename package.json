@@ -1,6 +1,6 @@
 {
   "name": "@gem-mine/sapphire",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "a fantastic react boilerplate ",
   "keywords": [
     "react",
@@ -19,8 +19,7 @@
   "main": "index.js",
   "bin": {
     "sapphire": "index.js",
-    "lanbs": "index.js",
-    "blue": "index.js"
+    "lanbs": "index.js"
   },
   "scripts": {
     "test": "mocha",
