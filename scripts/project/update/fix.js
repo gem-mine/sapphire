@@ -1,6 +1,8 @@
 const fs = require('fs-extra')
 const { log, readJSON, writeJSON } = require('@gem-mine/sapphire-helper')
 const deprecateCatEye = require('./codemon/deprecate-cat-eye')
+const enhanceRequest = require('./codemon/enhance-request')
+const deprecateIE8 = require('./codemon/deprecate-ie8')
 
 // 对包的清理，针对 gem-mine 项目
 function _fixPackage(root) {
@@ -8,15 +10,8 @@ function _fixPackage(root) {
   const pkg = readJSON(pkgPath)
   const { dependencies, devDependencies } = pkg
 
-  fs.removeSync(`${root}/package-lock.json`)
-  log.info('已删除 package-lock.json')
-  fs.removeSync(`${root}/manifest.json`)
-  log.info('已删除 manifest.json')
-  log.info('正在删除 node_modules，可能需要花费较多时间，请耐心等待')
-  fs.removeSync(`${root}/node_modules`)
-  log.info('删除 node_modules 成功')
   if (dependencies) {
-    const names = ['cat-eye']
+    const names = ['cat-eye', 'zero-immutable']
     names.forEach(name => {
       if (dependencies[name]) {
         delete dependencies[name]
@@ -30,6 +25,7 @@ function _fixPackage(root) {
     const names = [
       'babel-core',
       'babel-plugin-syntax-dynamic-import',
+      'babel-plugin-dynamic-import-webpack',
       'babel-plugin-transform-object-assign',
       'babel-plugin-transform-runtime',
       'babel-polyfill',
@@ -88,12 +84,30 @@ function _fixBabelrc(root) {
   }
 }
 
+function _deprecateFile(root) {
+  fs.removeSync(`${root}/package-lock.json`)
+  log.info('已删除 package-lock.json')
+
+  fs.removeSync(`${root}/manifest.json`)
+  log.info('已删除 manifest.json')
+
+  log.info('正在删除 node_modules，可能需要花费较多时间，请耐心等待')
+  fs.removeSync(`${root}/node_modules`)
+  log.info('删除 node_modules 成功')
+
+  fs.removeSync(`${root}/config/webpack/helper.js`)
+  log.info('删除历史文件 config/webpack/helper.js 成功')
+}
+
 module.exports = function (context) {
   const { root, fromGemMine } = context
   if (fromGemMine) {
+    _deprecateFile(root)
     _fixPackage(root)
     _fixBrowserslist(root)
     _fixBabelrc(root)
   }
   deprecateCatEye(root)
+  enhanceRequest(root)
+  deprecateIE8(root)
 }
