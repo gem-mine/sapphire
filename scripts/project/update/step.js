@@ -60,10 +60,6 @@ module.exports = async function (context) {
         if (ui) {
           updateBabelrc(context)
         }
-        // 自动格式化，处理 jscodeshift 插入的句尾分号问题
-        exec(`npm run lint --fix`, {
-          cwd: root
-        })
 
         // 进行 UI 库更新
         if (uiVersion) {
@@ -76,6 +72,11 @@ module.exports = async function (context) {
 
         // 更新 package 依赖
         updateProjectPackages(context)
+
+        // 自动格式化，处理 jscodeshift 插入的句尾分号问题
+        exec(`npm run lint --fix`, {
+          cwd: root
+        })
 
         report.success(context)
       }
