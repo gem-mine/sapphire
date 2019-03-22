@@ -1,6 +1,5 @@
 const babylon = require('babylon')
 const j = require('jscodeshift')
-const fs = require('fs-extra')
 
 const defaultOptions = {
   sourceType: 'module',
