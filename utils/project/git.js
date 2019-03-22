@@ -60,6 +60,7 @@ function copyTemplate(context, update = false) {
       'config/webpack.js',
       'config/constant.js',
       'config/proxy.js',
+      'src/index.js',
       'src/App.jsx',
       'src/components/home/index.jsx',
       'src/components/common',

@@ -1,6 +1,7 @@
 const j = require('jscodeshift')
 const fs = require('fs-extra')
 const { log } = require('@gem-mine/sapphire-helper')
+const parser = require('./parser')
 
 module.exports = function (root) {
   const file = `${root}/config/constant.js`
@@ -12,7 +13,7 @@ module.exports = function (root) {
 
 function transform(file) {
   const content = fs.readFileSync(file).toString()
-  const ast = j(content)
+  const ast = parser(content)
 
   let prev = []
   let next = []

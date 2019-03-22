@@ -2,14 +2,10 @@ const j = require('jscodeshift')
 const rd = require('rd')
 const fs = require('fs-extra')
 const { log } = require('@gem-mine/sapphire-helper')
+const parser = require('./parser')
 
 module.exports = function (root) {
-  const path = `${root}/src/global`
-  const src = `${path}/cat-eye.js`
-  const dist = `${path}/durex.js`
-  if (fs.existsSync(src)) {
-    fs.moveSync(src, dist, { overwrite: true })
-  }
+  fixIndexFile(root)
 
   log.info('将依赖 cat-eye 转换为 @gem-mine/durex，请求库为 @gem-mine/request, immutable 操作为 @gem-mine/immutable')
   rd.eachFilterSync(`${root}/src`, /\.jsx?$/, function (file) {
@@ -17,9 +13,33 @@ module.exports = function (root) {
   })
 }
 
+function fixIndexFile(root) {
+  const path = `${root}/src/global`
+  const src = `${path}/cat-eye.js`
+  const dist = `${path}/durex.js`
+  const indexFile = `${root}/src/index.js`
+  let content = fs.readFileSync(indexFile).toString()
+  if (fs.existsSync(src)) {
+    fs.moveSync(src, dist, { overwrite: true })
+  }
+  const catEyeConfigFile = `'global/cat-eye'`
+  content = content.replace(catEyeConfigFile, `'global/durex'`)
+
+  const patchFile = `import 'global/util/react-patch'`
+  if (content.indexOf(patchFile) === -1) {
+    const reactContent = /import\s+React\s+from\s+'react'/
+    const match = content.match(reactContent)
+    if (match) {
+      const position = match[0].length + match.index
+      content = content.slice(0, position) + `\n${patchFile}` + content.slice(position)
+    }
+  }
+  fs.writeFileSync(indexFile, content)
+}
+
 function transform(file) {
   const content = fs.readFileSync(file).toString()
-  const ast = j(content)
+  const ast = parser(content)
 
   const requestArr = []
   const immutableArr = []

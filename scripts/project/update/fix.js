@@ -1,8 +1,6 @@
 const fs = require('fs-extra')
 const { log, readJSON, writeJSON } = require('@gem-mine/sapphire-helper')
-const deprecateCatEye = require('./codemon/deprecate-cat-eye')
-const enhanceRequest = require('./codemon/enhance-request')
-const deprecateIE8 = require('./codemon/deprecate-ie8')
+const codemon = require('./codemon')
 
 // 对包的清理，针对 gem-mine 项目
 function _fixPackage(root) {
@@ -107,7 +105,5 @@ module.exports = function (context) {
     _fixBrowserslist(root)
     _fixBabelrc(root)
   }
-  deprecateCatEye(root)
-  enhanceRequest(root)
-  deprecateIE8(root)
+  codemon(root)
 }

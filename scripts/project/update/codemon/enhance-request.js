@@ -1,6 +1,7 @@
 const j = require('jscodeshift')
 const fs = require('fs-extra')
 const { log, getIn } = require('@gem-mine/sapphire-helper')
+const parser = require('./parser')
 
 module.exports = function (root) {
   const file = `${root}/src/global/request.js`
@@ -12,7 +13,7 @@ module.exports = function (root) {
 
 function transform(file) {
   const content = fs.readFileSync(file).toString()
-  const ast = j(content)
+  const ast = parser(content)
 
   // 头部加入全局变量声明
   const comment = '/* global ENV, DEBUG */'
