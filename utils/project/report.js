@@ -53,6 +53,12 @@ ${tip}
   * sapphire: ${SAPPHIRE_DOC} ${uiDoc}
 `)
   )
+
+  const arr = context.get('error_packages')
+  if (arr && arr.length) {
+    console.log(chalk.red(`请关注：安装以下包出现了错误，可能需要您手动进行安装:`))
+    console.error(arr)
+  }
 }
 
 /**

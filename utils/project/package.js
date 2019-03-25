@@ -1,6 +1,7 @@
 const fs = require('fs-extra')
 const chalk = require('chalk')
 const path = require('path')
+const compareVersions = require('compare-versions')
 const { readJSON, writeJSON, runNpm, log } = require('@gem-mine/sapphire-helper')
 const { ANTD_MOBILE, FISH_MOBILE } = require('../../constant/ui')
 const updateBabelrc = require('./babelrc')
@@ -94,30 +95,75 @@ function setPackageJson(packagePath, data) {
 }
 
 function getPackageVersion(pkg, name) {
-  const { dependencies } = pkg
-  let now
-  if (dependencies) {
-    const dist = dependencies[name]
+  if (pkg) {
+    const { dependencies, devDependencies } = pkg
+    let dist
+    if (dependencies) {
+      dist = dependencies[name]
+    }
+    if (!dist) {
+      if (devDependencies) {
+        dist = devDependencies[name]
+      }
+    }
+
+    let now
     if (dist) {
       now = dist.version || dist.replace(/^\D+/, '')
     }
+    return now
   }
-  return now
 }
 
-function updatePackage({ root, pkg, name, latest }) {
-  if (!latest) {
-    latest = runNpm(`npm show ${name} version`)
-  }
-  const now = getPackageVersion(pkg, name)
-  if (now) {
-    if (latest !== now) {
-      log.info(`正在更新包 ${chalk.green(name)}: ${chalk.gray(now)} → ${chalk.yellow(latest)}`)
-      runNpm(`npm i ${name}@latest --save --loglevel=error`, { cwd: root }, true)
+function updatePackage(context, { pkg, lock, name, latest }) {
+  const { root } = context
+  try {
+    const nodeModules = path.join(root, 'node_modules')
+    const now = getPackageVersion(lock, name) || getPackageVersion(pkg, name)
+    if (!latest) {
+      latest = runNpm(`npm show ${name} version`)
     }
-  } else {
-    log.info(`正在安装包 ${name}: ${latest}`)
-    runNpm(`npm i ${name}@latest --save --loglevel=error`, { cwd: root }, true)
+    let shouldUpdate = true // 根据版本判断是否要更新包
+    let currentVersion
+    if (latest) {
+      currentVersion = latest
+      latest = latest.replace(/^\D+/, '')
+      shouldUpdate = compareVersions(latest, now) > 0
+    } else {
+      currentVersion = 'latest'
+      shouldUpdate = false
+    }
+
+    if (now) {
+      // 本地 package.json 存在包，但版本不同，进行包更新
+      if (shouldUpdate) {
+        log.info(`正在更新包 ${chalk.green(name)}: ${chalk.gray(now)} → ${chalk.yellow(latest)}`)
+        runNpm(`npm i ${name}@${currentVersion} --save --loglevel=error`, { cwd: root }, true)
+      } else {
+        if (!fs.existsSync(`${nodeModules}/${name}`)) {
+          // 本地包被删除，进行包安装
+          log.info(`正在安装包 ${name}: ${latest}`)
+          runNpm(`npm i ${name}@${currentVersion} --save --loglevel=error`, { cwd: root }, true)
+        }
+      }
+    } else {
+      // 本地 package.json 不存在包，进行包安装
+      log.info(`正在安装包 ${name}: ${latest}`)
+      runNpm(`npm i ${name}@${currentVersion} --save --loglevel=error`, { cwd: root }, true)
+    }
+  } catch (e) {
+    let arr = context.get('error_packages')
+    const result = {
+      name,
+      message: e.message
+    }
+    if (!arr) {
+      arr = [result]
+    } else {
+      arr.push(result)
+    }
+    context.set('error_packages', arr)
+    log.error(`安装包 ${name} 失败: ${e.message}`)
   }
 }
 
@@ -125,12 +171,17 @@ function updatePackage({ root, pkg, name, latest }) {
  * 检测 项目中的依赖 是否和 模板中的依赖 版本一致，非一致情况会更新到 模板中对应的版本
  */
 function updateProjectPackages(context) {
-  const { root, shadow_path: shadowPath } = context
+  const { root, shadow_path: shadowPath, ui } = context
   log.info('正在检查更新项目依赖包（package.json 中声明的依赖）...')
   const pkgPath = path.join(root, 'package.json')
   const nodeModules = path.join(root, 'node_modules')
   const oldPkg = readJSON(pkgPath)
   const newPkg = readJSON(path.join(shadowPath, 'package.json'))
+  const lockPath = path.join(root, 'package-lock.json')
+  let lockPkg
+  if (fs.existsSync(lockPath)) {
+    lockPkg = readJSON(lockPath)
+  }
   let shouldUpdate = false
   ;(function (items) {
     items.forEach(function (item) {
@@ -143,22 +194,16 @@ function updateProjectPackages(context) {
           oldPkg[key][name] = newVersion
           shouldUpdate = true
           if (isPackage) {
-            if (oldVersion) {
-              log.info(`正在更新包 ${name}: ${oldVersion} → ${newVersion}`)
-            } else {
-              log.info(`正在安装包 ${name}@${newVersion}`)
-            }
-            runNpm(`npm i ${name}@${newVersion} --loglevel=error`, { cwd: root }, true)
+            updatePackage(context, { pkg: oldPkg, lock: lockPkg, name, latest: newVersion })
           }
         }
       })
       if (isPackage) {
         // 原 package.json 中的包如果不存在了，应该重新安装
         Object.keys(oldPkg[key]).forEach(function (name) {
-          if (!fs.existsSync(`${nodeModules}/${name}`)) {
+          if (name !== ui) {
             const version = oldPkg[key][name]
-            log.info(`正在安装包 ${name}@${version}`)
-            runNpm(`npm i ${name}@${version} --loglevel=error`, { cwd: root }, true)
+            updatePackage(context, { pkg: oldPkg, lock: lockPkg, name, latest: version })
           }
         })
       }

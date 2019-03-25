@@ -48,9 +48,6 @@ module.exports = async function (context) {
         })
       )
       if (goon) {
-        // 清理修复工作
-        fix(context)
-
         // 进行模板更新
         cloneTemplate(context) // 获取模板
         copyTemplate(context, true) // 拷贝脚手架
@@ -61,11 +58,14 @@ module.exports = async function (context) {
           updateBabelrc(context)
         }
 
+        // 清理修复工作
+        fix(context)
+
         // 进行 UI 库更新
         if (uiVersion) {
-          updatePackage({ root, pkg, name: ui, uiVersion })
+          updatePackage(context, { pkg, name: ui, uiVersion })
           if (ui === ANTD_MOBILE || ui === FISH_MOBILE) {
-            updatePackage({ root, pkg, name: 'rc-form' })
+            updatePackage(context, { pkg, name: 'rc-form' })
           }
           context.set('ui_version', uiVersion)
         }
