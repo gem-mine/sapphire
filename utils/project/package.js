@@ -152,6 +152,9 @@ function updatePackage(context, { pkg, lock, name, latest }) {
       runNpm(`npm i ${name}@${currentVersion} --save --loglevel=error`, { cwd: root }, true)
     }
   } catch (e) {
+    if (e.signal === 'SIGINT') {
+      throw new Error(e)
+    }
     let arr = context.get('error_packages')
     const result = {
       name,

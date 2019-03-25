@@ -9,6 +9,11 @@ const pkg = require('./package.json') // sapphire 的 package.json
 const context = require('./context')
 const { exec } = require('@gem-mine/sapphire-helper')
 
+process.on('SIGINT', function () {
+  console.log('用户主动终止程序')
+  process.exit()
+})
+
 // 检查环境再开始执行
 checkNodeVersion()
 checkGit()
