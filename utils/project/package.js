@@ -142,7 +142,7 @@ function updatePackage(context, { pkg, lock, name, latest }) {
       } else {
         if (!fs.existsSync(`${nodeModules}/${name}`)) {
           // 本地包被删除，进行包安装
-          log.info(`正在安装包 ${name}: ${latest}`)
+          log.info(`包版本未变更，但 node_modules 中不存在，正在安装包 ${name}: ${latest}`)
           runNpm(`npm i ${name}@${currentVersion} --save --loglevel=error`, { cwd: root }, true)
         }
       }
