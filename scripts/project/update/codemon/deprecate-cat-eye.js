@@ -70,6 +70,7 @@ function transform(file) {
       if (left.length) {
         return j.importDeclaration(left, j.literal('@gem-mine/durex'), path.value.importKind)
       }
+      log.info(`\t 处理文件 ${file} 成功`)
     })
 
   requestArr.forEach(item => {
