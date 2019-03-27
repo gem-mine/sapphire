@@ -3,7 +3,7 @@ const fs = require('fs-extra')
 const { readJSON, writeJSON, log, getIn } = require('@gem-mine/sapphire-helper')
 const report = require('./report')
 const { EXIT_CODE } = require('../../constant/core')
-const KEYS = ['name', 'platform', 'ui', 'ui_version', 'sxp', 'template_version']
+const KEYS = ['id', 'name', 'platform', 'ui', 'ui_version', 'sxp', 'template_version']
 
 /**
  * 保存信息到 .sapphire
