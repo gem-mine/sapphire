@@ -4,7 +4,7 @@ const { runNpm, checkTemplateVersion, exec } = require('@gem-mine/sapphire-helpe
 const choice = require('../../../utils/choice')
 const updateBabelrc = require('../../../utils/project/babelrc')
 const { cloneTemplate, copyTemplate } = require('../../../utils/project/git')
-const { updateProjectPackages, getPackageJson, getPackageVersion, updatePackage } = require('../../../utils/project/package')
+const { updateProjectPackages, getPackageJson, getPackageVersion } = require('../../../utils/project/package')
 const { ANTD_MOBILE, FISH_MOBILE } = require('../../../constant/ui')
 const { diffVersion } = require('./helper')
 const report = require('../../../utils/project/report')
@@ -63,9 +63,9 @@ module.exports = async function (context) {
 
         // 进行 UI 库更新
         if (uiVersion) {
-          updatePackage(context, { pkg, name: ui, uiVersion })
+          runNpm(`npm i ${ui}@${uiVersion}`, { cwd: root }, true)
           if (ui === ANTD_MOBILE || ui === FISH_MOBILE) {
-            updatePackage(context, { pkg, name: 'rc-form' })
+            runNpm(`npm i rc-form`, { cwd: root }, true)
           }
           context.set('ui_version', uiVersion)
         }

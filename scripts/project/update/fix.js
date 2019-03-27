@@ -89,21 +89,19 @@ function _deprecateFile(root) {
   fs.removeSync(`${root}/manifest.json`)
   log.info('已删除 manifest.json')
 
+  fs.removeSync(`${root}/config/webpack/helper.js`)
+  log.info('删除历史文件 config/webpack/helper.js 成功')
+
   log.info('正在删除 node_modules，可能需要花费较多时间，请耐心等待')
   fs.removeSync(`${root}/node_modules`)
   log.info('删除 node_modules 成功')
-
-  fs.removeSync(`${root}/config/webpack/helper.js`)
-  log.info('删除历史文件 config/webpack/helper.js 成功')
 }
 
 module.exports = function (context) {
-  const { root, fromGemMine } = context
-  if (fromGemMine) {
-    _deprecateFile(root)
-    _fixPackage(root)
-    _fixBrowserslist(root)
-    _fixBabelrc(root)
-  }
+  const { root } = context
+  _deprecateFile(root)
+  _fixPackage(root)
+  _fixBrowserslist(root)
+  _fixBabelrc(root)
   codemon(root)
 }

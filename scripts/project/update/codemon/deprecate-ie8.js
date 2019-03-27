@@ -9,6 +9,11 @@ module.exports = function (root) {
     transform(file)
     log.info('去除 config/constant.js 中 SUPPORT_IE8 常量')
   }
+
+  const index = `${root}/public/index.html`
+  if (fs.existsSync(index)) {
+    updateIndexHTML(index)
+  }
 }
 
 function transform(file) {
@@ -39,4 +44,10 @@ function transform(file) {
   }
 
   fs.writeFileSync(file, ast.toSource())
+}
+
+function updateIndexHTML(file) {
+  let content = fs.readFileSync(file).toString()
+  content = content.replace(/<!--\[\s*if\s+lte\s+IE\s+9\]>.+<!\[\s*endif\s*\]-->/g, '')
+  fs.writeFileSync(file, content)
 }

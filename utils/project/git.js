@@ -56,6 +56,7 @@ function copyTemplate(context, update = false) {
     ignores.push('package.json')
     // 更新模式下要被删除的文件，因为这些文件很可能被用户进行了修改
     const excludes = [
+      'public/index.html',
       'public/favicon.ico',
       'config/webpack.js',
       'config/constant.js',
