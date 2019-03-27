@@ -15,10 +15,11 @@ module.exports = function (program) {
         command: COMMAND.UPDATE,
         root
       })
+
+      context.set(getProjectInitConfig(context))
       if (!context.get('id')) {
         context.set('id', genId())
       }
-      context.set(getProjectInitConfig(context))
       await step(context)
     })
 }
