@@ -23,6 +23,10 @@ async function _checkAndUpdateUI(context, pkg) {
         })
       )
       if (goon) {
+        context.set({
+          uiPrevVersion: now,
+          uiLatestVersion: latest
+        })
         return latest
       }
     }

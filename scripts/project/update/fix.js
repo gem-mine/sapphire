@@ -103,5 +103,5 @@ module.exports = function (context) {
   _fixPackage(root)
   _fixBrowserslist(root)
   _fixBabelrc(root)
-  codemon(root)
+  codemon(context)
 }
