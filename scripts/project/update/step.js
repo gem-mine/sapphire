@@ -15,6 +15,7 @@ async function _checkAndUpdateUI(context, pkg) {
   if (ui) {
     const latest = runNpm(`npm show ${ui} version`)
     const now = getPackageVersion(pkg, ui)
+    context.set('ui_version', now)
     if (latest !== now) {
       const { goon } = await prompt(
         choice.goon({
