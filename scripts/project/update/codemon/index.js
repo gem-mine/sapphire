@@ -4,6 +4,7 @@ const deprecateIE8 = require('./deprecate-ie8')
 const fixAntPrefixCls = require('./fix-ant-prefix-cls')
 const fixFishImport = require('./fix-fish-import')
 const { FISH } = require('../../../../constant/ui')
+const deprecateDurexWithRouter = require('./deprecate-durex-with-router')
 
 module.exports = function (context) {
   const { root, ui, uiPrevVersion, uiLatestVersion } = context
@@ -14,4 +15,5 @@ module.exports = function (context) {
     fixAntPrefixCls(root)
   }
   fixFishImport(root)
+  deprecateDurexWithRouter(root)
 }
