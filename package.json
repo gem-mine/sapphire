@@ -40,7 +40,7 @@
     "jscodeshift": "^0.6.3",
     "mkdirp": "^0.5.1",
     "rd": "^2.0.1",
-    "update-notifier": "^2.5.0",
+    "update-notifier": "^3.0.1",
     "validate-npm-package-name": "^3.0.0"
   },
   "devDependencies": {
